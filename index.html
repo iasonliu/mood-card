@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>MoodHand 情绪手账 · 每日手绘心情卡片</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=ZCOOL+KuaiLe&family=Ma+Shan+Zheng&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+<!-- html2canvas 1.4.1 用于高保真位图导出 -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     1. 设计令牌体系 (Design Tokens & Color Schemes)
+     ───────────────────────────────────────────────────────────── */
+  :root, html[data-theme="pine"], body[data-theme="pine"] {
+    --hw-paper: #FFFFFC;
+    --hw-paper-tint: #F6F4EB;
+    --hw-card-bg: #FCFAF2;
+    --hw-ink: #003E1F;
+    --hw-ink-soft: rgba(0, 62, 31, 0.70);
+    --hw-ink-subtle: rgba(0, 62, 31, 0.12);
+    --hw-accent: #53A548;
+    --hw-accent-ink: #326E2A;
+    --hw-accent-bg: rgba(83, 165, 72, 0.14);
+    --hw-stamp: #C4553B;
+    --hw-card-border: #003E1F;
+    --hw-tape: rgba(220, 205, 155, 0.72);
+    --card-shadow: 6px 8px 0px var(--hw-ink);
+  }
+
+  html[data-theme="terracotta"], body[data-theme="terracotta"] {
+    --hw-paper: #FFFDF9;
+    --hw-paper-tint: #F8F1E7;
+    --hw-card-bg: #FCF7F0;
+    --hw-ink: #2C2420;
+    --hw-ink-soft: rgba(44, 36, 32, 0.70);
+    --hw-ink-subtle: rgba(44, 36, 32, 0.12);
+    --hw-accent: #C4553B;
+    --hw-accent-ink: #9E3A23;
+    --hw-accent-bg: rgba(196, 85, 59, 0.14);
+    --hw-stamp: #C4553B;
+    --hw-card-border: #2C2420;
+    --hw-tape: rgba(230, 195, 175, 0.72);
+    --card-shadow: 6px 8px 0px var(--hw-ink);
+  }
+
+  html[data-theme="indigo"], body[data-theme="indigo"] {
+    --hw-paper: #FDFBFA;
+    --hw-paper-tint: #EDF1F7;
+    --hw-card-bg: #F7FAFC;
+    --hw-ink: #1B2845;
+    --hw-ink-soft: rgba(27, 40, 69, 0.70);
+    --hw-ink-subtle: rgba(27, 40, 69, 0.12);
+    --hw-accent: #4A6FA5;
+    --hw-accent-ink: #2B4C7E;
+    --hw-accent-bg: rgba(74, 111, 165, 0.14);
+    --hw-stamp: #D14949;
+    --hw-card-border: #1B2845;
+    --hw-tape: rgba(190, 205, 230, 0.72);
+    --card-shadow: 6px 8px 0px var(--hw-ink);
+  }
+
+  html[data-theme="sunset"], body[data-theme="sunset"] {
+    --hw-paper: #FFFDF8;
+    --hw-paper-tint: #FCF0E8;
+    --hw-card-bg: #FDF6F0;
+    --hw-ink: #3D261C;
+    --hw-ink-soft: rgba(61, 38, 28, 0.70);
+    --hw-ink-subtle: rgba(61, 38, 28, 0.12);
+    --hw-accent: #E26D46;
+    --hw-accent-ink: #B34824;
+    --hw-accent-bg: rgba(226, 109, 70, 0.14);
+    --hw-stamp: #C93B3B;
+    --hw-card-border: #3D261C;
+    --hw-tape: rgba(240, 200, 175, 0.72);
+    --card-shadow: 6px 8px 0px var(--hw-ink);
+  }
+
+  html[data-theme="lavender"], body[data-theme="lavender"] {
+    --hw-paper: #FDFBFF;
+    --hw-paper-tint: #F3EEF8;
+    --hw-card-bg: #FAF6FD;
+    --hw-ink: #2E223D;
+    --hw-ink-soft: rgba(46, 34, 61, 0.70);
+    --hw-ink-subtle: rgba(46, 34, 61, 0.12);
+    --hw-accent: #8762A6;
+    --hw-accent-ink: #653E87;
+    --hw-accent-bg: rgba(135, 98, 166, 0.14);
+    --hw-stamp: #BF4372;
+    --hw-card-border: #2E223D;
+    --hw-tape: rgba(215, 195, 230, 0.72);
+    --card-shadow: 6px 8px 0px var(--hw-ink);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    background-color: var(--hw-paper-tint);
+    background-image: radial-gradient(circle, var(--hw-ink-subtle) 1.2px, transparent 1.2px);
+    background-size: 26px 26px;
+    color: var(--hw-ink);
+    font-family: 'Patrick Hand', 'ZCOOL KuaiLe', cursive, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 14px 60px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     2. 顶部品牌与导航栏
+     ───────────────────────────────────────────────────────────── */
+  .app-header {
+    text-align: center;
+    margin-bottom: 18px;
+    max-width: 480px;
+    width: 100%;
+  }
+
+  .brand-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 14px;
+    background: var(--hw-accent-bg);
+    color: var(--hw-accent-ink);
+    border: 1.5px dashed var(--hw-accent);
+    border-radius: 20px;
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+
+  .brand-pill svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+  }
+
+  .app-title {
+    font-size: 34px;
+    line-height: 1.2;
+    color: var(--hw-ink);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .app-subtitle {
+    font-size: 15px;
+    color: var(--hw-ink-soft);
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     3. 核心卡片容器 (Polaroid / Journal Architecture)
+     ───────────────────────────────────────────────────────────── */
+  .app-layout {
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+  }
+
+  .card-container {
+    width: 100%;
+    position: relative;
+  }
+
+  .mood-card {
+    background: var(--hw-card-bg);
+    border: 3px solid var(--hw-card-border);
+    border-radius: 18px;
+    padding: 22px 18px 18px;
+    box-shadow: var(--card-shadow);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+  }
+
+  /* 背景纸纹类型切换 */
+  .pattern-grid {
+    background-image: 
+      linear-gradient(var(--hw-ink-subtle) 1px, transparent 1px),
+      linear-gradient(90deg, var(--hw-ink-subtle) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  .pattern-dots {
+    background-image: radial-gradient(circle, var(--hw-ink-subtle) 1.2px, transparent 1.2px);
+    background-size: 16px 16px;
+  }
+
+  .pattern-lines {
+    background-image: linear-gradient(var(--hw-ink-subtle) 1px, transparent 1px);
+    background-size: 100% 24px;
+  }
+
+  .pattern-blank {
+    background-image: none;
+  }
+
+  /* 顶部纸胶带 */
+  .tape-strip {
+    position: absolute;
+    top: -12px;
+    width: 120px;
+    height: 26px;
+    background: var(--hw-tape);
+    border-left: 2px dashed rgba(0,0,0,0.2);
+    border-right: 2px dashed rgba(0,0,0,0.2);
+    transform: rotate(-2.5deg);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  /* 顶部元数据栏 */
+  .card-header-bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    border-bottom: 1.5px dashed var(--hw-ink-subtle);
+    margin-bottom: 8px;
+  }
+
+  .date-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 15px;
+    font-weight: bold;
+    color: var(--hw-ink);
+  }
+
+  .weather-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    background: var(--hw-accent-bg);
+    color: var(--hw-accent-ink);
+    border: 1px solid var(--hw-accent);
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .svg-icon {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     4. 小人手绘舞台 (Avatar Stage)
+     ───────────────────────────────────────────────────────────── */
+  .stage-box {
+    width: 250px;
+    height: 250px;
+    position: relative;
+    cursor: pointer;
+    margin: 2px 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--hw-accent-bg) 0%, transparent 72%);
+    transition: transform 0.15s;
+  }
+
+  .stage-box:hover .poke-badge {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .poke-badge {
+    position: absolute;
+    bottom: 0px;
+    font-size: 12px;
+    background: var(--hw-ink);
+    color: var(--hw-paper);
+    padding: 3px 10px;
+    border-radius: 12px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: all 0.2s;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  canvas.doodle-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     5. 卡片内容组件 (Mood Tag / Energy Meter / Checklist / Quote)
+     ───────────────────────────────────────────────────────────── */
+  .tag-capsule {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 18px;
+    border: 2.5px solid var(--hw-ink);
+    border-radius: 24px;
+    font-size: 20px;
+    font-weight: bold;
+    background: var(--hw-paper);
+    box-shadow: 2px 3px 0 var(--hw-ink);
+    color: var(--hw-ink);
+    margin-bottom: 10px;
+  }
+
+  .quote-box {
+    width: 100%;
+    padding: 6px 10px;
+    text-align: center;
+    min-height: 64px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .quote-phrase {
+    font-size: 20px;
+    line-height: 1.45;
+    color: var(--hw-ink);
+    font-weight: 600;
+  }
+
+  /* 手绘能量槽 / 摸鱼电量 (来自 VideoHand slider-tune / gauge 规范) */
+  .energy-widget {
+    width: 100%;
+    background: var(--hw-paper);
+    border: 2px solid var(--hw-ink);
+    border-radius: 12px;
+    padding: 8px 12px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    box-shadow: 2px 2px 0 var(--hw-ink);
+  }
+
+  .energy-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--hw-ink-soft);
+  }
+
+  .energy-track {
+    width: 100%;
+    height: 12px;
+    background: var(--hw-paper-tint);
+    border: 1.5px solid var(--hw-ink);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .energy-fill {
+    height: 100%;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--hw-accent),
+      var(--hw-accent) 6px,
+      var(--hw-accent-ink) 6px,
+      var(--hw-accent-ink) 12px
+    );
+    border-right: 1.5px solid var(--hw-ink);
+    transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* 今日随手记打卡清单 (VideoHand checkbox-tick-list 规范) */
+  .checklist-widget {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+    padding: 0 4px;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--hw-ink-soft);
+  }
+
+  .check-box-icon {
+    width: 16px;
+    height: 16px;
+    border: 1.8px solid var(--hw-ink);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hw-paper);
+    color: var(--hw-accent-ink);
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+
+  .check-item.done {
+    text-decoration: line-through;
+    opacity: 0.65;
+  }
+
+  /* 手绘波浪分割线 */
+  canvas.wave-bar {
+    width: 100%;
+    height: 14px;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  /* 底部作者与印章 */
+  .card-bottom-bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-top: 6px;
+    border-top: 1px dashed var(--hw-ink-subtle);
+  }
+
+  .author-sig {
+    font-size: 16px;
+    color: var(--hw-ink-soft);
+  }
+
+  .stamp-badge {
+    width: 48px;
+    height: 48px;
+    border: 2px dashed var(--hw-stamp);
+    border-radius: 50%;
+    color: var(--hw-stamp);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: bold;
+    line-height: 1.1;
+    transform: rotate(12deg);
+    opacity: 0.9;
+    user-select: none;
+  }
+
+  .stamp-badge b {
+    font-size: 11px;
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     6. 控制操作面板 (Interactive Control Panel)
+     ───────────────────────────────────────────────────────────── */
+  .ctrl-panel {
+    width: 100%;
+    background: var(--hw-paper);
+    border: 2.5px solid var(--hw-ink);
+    border-radius: 16px;
+    padding: 16px 14px;
+    box-shadow: 4px 5px 0 var(--hw-ink);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .input-wrapper {
+    position: relative;
+    width: 100%;
+  }
+
+  .sketch-input {
+    width: 100%;
+    height: 46px;
+    padding: 0 14px;
+    font-family: inherit;
+    font-size: 17px;
+    background: var(--hw-paper-tint);
+    border: 2px solid var(--hw-ink);
+    border-radius: 10px;
+    outline: none;
+    color: var(--hw-ink);
+  }
+
+  .sketch-input:focus {
+    border-color: var(--hw-accent);
+    background: #fff;
+  }
+
+  .panel-section-title {
+    font-size: 14px;
+    color: var(--hw-ink-soft);
+    margin-bottom: 6px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* 心情按钮网格 */
+  .mood-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .mood-tab {
+    background: var(--hw-paper-tint);
+    border: 2px solid var(--hw-ink);
+    padding: 8px 4px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 15px;
+    color: var(--hw-ink);
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--hw-ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.1s ease;
+  }
+
+  .mood-tab .svg-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .mood-tab:active, .mood-tab.active {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0;
+    background: var(--hw-accent-bg);
+    border-color: var(--hw-accent-ink);
+    color: var(--hw-accent-ink);
+    font-weight: bold;
+  }
+
+  /* 手账纸底纹 & 颜色切换条 */
+  .custom-options-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .pattern-selector, .theme-selector {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .pattern-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+    border: 1.5px solid var(--hw-ink);
+    border-radius: 6px;
+    background: var(--hw-paper-tint);
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--hw-ink);
+  }
+
+  .pattern-btn.active {
+    background: var(--hw-ink);
+    color: var(--hw-paper);
+  }
+
+  .theme-circle {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--hw-ink);
+    cursor: pointer;
+    box-shadow: 1px 1px 0 var(--hw-ink);
+    position: relative;
+  }
+
+  .theme-circle.active::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    background: #fff;
+    border-radius: 50%;
+  }
+
+  /* 底部按钮栏 */
+  .button-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .main-btn {
+    flex: 1;
+    height: 48px;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: bold;
+    background: var(--hw-paper);
+    border: 2.5px solid var(--hw-ink);
+    border-radius: 12px;
+    box-shadow: 3px 4px 0 var(--hw-ink);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: var(--hw-ink);
+    transition: all 0.1s;
+  }
+
+  .main-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .main-btn:active {
+    transform: translate(3px, 4px);
+    box-shadow: 0 0 0;
+  }
+
+  .btn-accent {
+    background: var(--hw-accent);
+    color: #fff;
+  }
+
+  .btn-accent:active {
+    background: var(--hw-accent-ink);
+  }
+
+  .footer-tip {
+    font-size: 13px;
+    color: var(--hw-ink-soft);
+    text-align: center;
+  }
+
+  /* Toast */
+  .toast-box {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-60px);
+    background: var(--hw-ink);
+    color: var(--hw-paper);
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    opacity: 0;
+    transition: all 0.25s ease;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    pointer-events: none;
+  }
+
+  .toast-box.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+
+<body>
+
+  <div class="toast-box" id="toast">
+    <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    <span id="toast-text">卡片已就绪</span>
+  </div>
+
+  <!-- 头部品牌 -->
+  <header class="app-header">
+    <div class="brand-pill">
+      <svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+      <span>MoodHand Visual System</span>
+    </div>
+    <h1 class="app-title">🎭 每日手绘小人心情卡</h1>
+    <p class="app-subtitle">手绘矢量契约 · 多重服饰动作道具 · 拟真手账质感</p>
+  </header>
+
+  <!-- 主体卡片区域 -->
+  <main class="app-layout">
+    
+    <div class="card-container">
+      <article class="mood-card pattern-grid" id="mood-card">
+        <div class="tape-strip"></div>
+
+        <!-- 顶部信息栏 -->
+        <div class="card-header-bar">
+          <div class="date-badge">
+            <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span id="date-display">2026.08.19</span>
+          </div>
+          <div class="weather-pill" id="weather-display">
+            <svg class="svg-icon" id="weather-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <span id="weather-text">微风拂面</span>
+          </div>
+        </div>
+
+        <!-- 手绘小人舞台 (支持戳一戳交互与丰富道具) -->
+        <div class="stage-box" id="avatar-stage" title="戳一下互动！">
+          <canvas class="doodle-canvas" id="avatarCanvas" width="500" height="500"></canvas>
+          <div class="poke-badge">
+            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+            <span>戳一戳蹦跶</span>
+          </div>
+        </div>
+
+        <!-- 情绪标签胶囊 (带有精美 SVG 图标) -->
+        <div class="tag-capsule" id="tag-capsule">
+          <span id="tag-icon-wrap"></span>
+          <span id="tag-text">快乐放空中</span>
+        </div>
+
+        <!-- 治愈手写金句 -->
+        <div class="quote-box">
+          <p class="quote-phrase" id="quote-text">“生活明朗，万物可爱，今天心情有八颗星！”</p>
+        </div>
+
+        <!-- 状态能量仪表槽 (VideoHand 风格) -->
+        <div class="energy-widget">
+          <div class="energy-header">
+            <span id="energy-title">⚡ 精神能量状态</span>
+            <span id="energy-value">85%</span>
+          </div>
+          <div class="energy-track">
+            <div class="energy-fill" id="energy-bar" style="width: 85%;"></div>
+          </div>
+        </div>
+
+        <!-- 今日随手清单 (VideoHand Checkbox 规范) -->
+        <div class="checklist-widget" id="checklist-box">
+          <div class="check-item done">
+            <div class="check-box-icon"><svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span id="todo-1">喝足 1000ml 温水</span>
+          </div>
+          <div class="check-item done">
+            <div class="check-box-icon"><svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <span id="todo-2">认真发呆 10 分钟</span>
+          </div>
+          <div class="check-item">
+            <div class="check-box-icon"></div>
+            <span id="todo-3">早点收工拥抱好梦</span>
+          </div>
+        </div>
+
+        <!-- 手绘波浪分割条 -->
+        <canvas class="wave-bar" id="waveCanvas" width="380" height="20"></canvas>
+
+        <!-- 底部署名与戳记 -->
+        <div class="card-bottom-bar">
+          <div class="author-sig" id="author-sig">— @匿名漫游者</div>
+          <div class="stamp-badge">
+            <span>MOOD</span>
+            <b>PASS</b>
+          </div>
+        </div>
+
+      </article>
+    </div>
+
+    <!-- 用户操作面板 -->
+    <section class="ctrl-panel">
+      <!-- 文本输入 -->
+      <div class="input-wrapper">
+        <input type="text" id="userInput" class="sketch-input" placeholder="输入昵称 / 此时此刻的碎碎念..." maxlength="25" autocomplete="off">
+      </div>
+
+      <!-- 情绪选择器 (6 种维度) -->
+      <div>
+        <div class="panel-section-title">
+          <span>选择心境状态</span>
+          <span style="font-size:12px;opacity:0.75;">改变五官动作与能量</span>
+        </div>
+        <div class="mood-grid">
+          <button class="mood-tab active" data-mood="happy">
+            <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            <span>嗨到起飞</span>
+          </button>
+          <button class="mood-tab" data-mood="chill">
+            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            <span>佛系摸鱼</span>
+          </button>
+          <button class="mood-tab" data-mood="tired">
+            <svg class="svg-icon" viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11"/><line x1="6" y1="12" x2="8" y2="12"/></svg>
+            <span>电量见底</span>
+          </button>
+          <button class="mood-tab" data-mood="rage">
+            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>
+            <span>炸毛暴走</span>
+          </button>
+          <button class="mood-tab" data-mood="curious">
+            <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>脑洞大开</span>
+          </button>
+          <button class="mood-tab" data-mood="cozy">
+            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <span>想睡大觉</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 纸张底纹 & 色板 -->
+      <div class="custom-options-row">
+        <div>
+          <div class="panel-section-title" style="margin-bottom:4px;"><span>底纹</span></div>
+          <div class="pattern-selector">
+            <button class="pattern-btn active" data-pattern="grid">方格</button>
+            <button class="pattern-btn" data-pattern="dots">点阵</button>
+            <button class="pattern-btn" data-pattern="lines">横线</button>
+            <button class="pattern-btn" data-pattern="blank">留白</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel-section-title" style="margin-bottom:4px;"><span>色调</span></div>
+          <div class="theme-selector">
+            <div class="theme-circle active" data-theme="pine" style="background:#003E1F;" title="松绿"></div>
+            <div class="theme-circle" data-theme="terracotta" style="background:#C4553B;" title="砖红"></div>
+            <div class="theme-circle" data-theme="indigo" style="background:#1B2845;" title="靛蓝"></div>
+            <div class="theme-circle" data-theme="sunset" style="background:#E26D46;" title="落日"></div>
+            <div class="theme-circle" data-theme="lavender" style="background:#8762A6;" title="暮紫"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="button-row">
+        <button class="main-btn" id="btn-random">
+          <svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="16" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="8" cy="16" r="1.5"/></svg>
+          <span>随机抽卡</span>
+        </button>
+        <button class="main-btn btn-accent" id="btn-export">
+          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>保存手账</span>
+        </button>
+      </div>
+
+      <div class="footer-tip">
+        支持直接导出 3x 拍立得卡片 · 零外部资源即可部署 GitHub Pages
+      </div>
+    </section>
+
+  </main>
+
+<script>
+/* ─────────────────────────────────────────────────────────────
+   1. 确定性随机数与哈希算法 (Mulberry32 Engine)
+   ───────────────────────────────────────────────────────────── */
+function hashSeed(str) {
+  let h = 1779033703 ^ str.length;
+  for (let i = 0; i < str.length; i++) {
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  h = Math.imul(h ^ (h >>> 16), 2246822507);
+  h = Math.imul(h ^ (h >>> 13), 3266489909);
+  return (h ^ (h >>> 16)) >>> 0;
+}
+
+function mulberry32(a) {
+  return function () {
+    a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const rngFrom = (str) => mulberry32(hashSeed(str));
+const pick = (rng, arr) => arr[Math.floor(rng() * arr.length)];
+const jit = (rng, a) => (rng() - 0.5) * 2 * a;
+const lerp = (a, b, t) => a + (b - a) * t;
+
+/* ─────────────────────────────────────────────────────────────
+   2. Web Audio 拟真音效系统
+   ───────────────────────────────────────────────────────────── */
+class SoundEngine {
+  constructor() { this.ctx = null; }
+  init() {
+    if (!this.ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) this.ctx = new AudioCtx();
+    }
+  }
+  playPop() {
+    try {
+      this.init();
+      if (!this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(460, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(920, this.ctx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.08);
+    } catch(e) {}
+  }
+  playWoosh() {
+    try {
+      this.init();
+      if (!this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(240, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(620, this.ctx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.14, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.12);
+    } catch(e) {}
+  }
+}
+const sound = new SoundEngine();
+
+/* ─────────────────────────────────────────────────────────────
+   3. 手绘笔触核心算法 (Wobbly Stroke Engine)
+   ───────────────────────────────────────────────────────────── */
+function getComputedThemeColors() {
+  const style = getComputedStyle(document.body);
+  return {
+    ink: style.getPropertyValue('--hw-ink').trim() || '#003E1F',
+    accent: style.getPropertyValue('--hw-accent').trim() || '#53A548',
+    accentInk: style.getPropertyValue('--hw-accent-ink').trim() || '#326E2A',
+    paper: style.getPropertyValue('--hw-paper').trim() || '#FFFFFC',
+  };
+}
+
+function strokePts(ctx, rng, pts, o = {}) {
+  const colors = getComputedThemeColors();
+  const {
+    w = 3.6,
+    passes = 2,
+    wob = 2.0,
+    color = colors.ink,
+    alpha = 0.94,
+    close = false
+  } = o;
+
+  ctx.strokeStyle = color;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  for (let p = 0; p < passes; p++) {
+    ctx.globalAlpha = alpha * (p ? 0.48 : 1);
+    ctx.lineWidth = Math.max(1.6, w * (0.86 + rng() * 0.28));
+
+    const q = pts.map(pt => [pt[0] + jit(rng, wob), pt[1] + jit(rng, wob)]);
+    ctx.beginPath();
+    ctx.moveTo(q[0][0], q[0][1]);
+    for (let i = 1; i < q.length; i++) {
+      const a = q[i - 1], b = q[i];
+      ctx.quadraticCurveTo(a[0], a[1], (a[0] + b[0]) / 2, (a[1] + b[1]) / 2);
+    }
+    const last = q[q.length - 1];
+    ctx.lineTo(last[0], last[1]);
+    if (close) ctx.closePath();
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function ellipsePts(cx, cy, rx, ry, n = 18, a0 = 0, a1 = Math.PI * 2) {
+  const pts = [];
+  for (let i = 0; i <= n; i++) {
+    const a = a0 + (a1 - a0) * i / n;
+    pts.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]);
+  }
+  return pts;
+}
+
+function polyFill(ctx, rng, pts, color, alpha = 1) {
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+  ctx.closePath();
+  ctx.fill();
+  ctx.globalAlpha = 1;
+}
+
+function blobFill(ctx, rng, cx, cy, rx, ry, color, alpha = 1) {
+  const pts = ellipsePts(cx, cy, rx, ry, 16).map(p => [
+    p[0] + jit(rng, rx * 0.06),
+    p[1] + jit(rng, ry * 0.06)
+  ]);
+  polyFill(ctx, rng, pts, color, alpha);
+}
+
+function line(ctx, rng, x0, y0, x1, y1, o = {}) {
+  const pts = [];
+  for (let i = 0; i <= 4; i++) pts.push([lerp(x0, x1, i / 4), lerp(y0, y1, i / 4)]);
+  strokePts(ctx, rng, pts, o);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   4. 情绪知识库与 SVG 矢量图标映射
+   ───────────────────────────────────────────────────────────── */
+const SVG_ICONS = {
+  happy: `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`,
+  chill: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>`,
+  tired: `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11"/><line x1="6" y1="12" x2="8" y2="12"/></svg>`,
+  rage: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>`,
+  curious: `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+  cozy: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`
+};
+
+const WEATHER_ITEMS = [
+  { text: '晴空万里', icon: `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>` },
+  { text: '多云转晴', icon: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>` },
+  { text: '微风轻拂', icon: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>` },
+  { text: '细雨敲窗', icon: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/><line x1="8" y1="19" x2="8" y2="21"/><line x1="12" y1="19" x2="12" y2="21"/><line x1="16" y1="19" x2="16" y2="21"/></svg>` },
+  { text: '星光闪烁', icon: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>` },
+  { text: '初雪微凉', icon: `<svg class="svg-icon" viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><line x1="4.93" y1="19.07" x2="19.07" y2="4.93"/></svg>` }
+];
+
+const MOOD_DATABASE = {
+  happy: {
+    tag: '快乐起飞',
+    energyTitle: '⚡ 快乐充电状态',
+    energyVal: 92,
+    quotes: [
+      '“生活明朗，万物可爱，今天心情有八颗星！”',
+      '“好运正在狂奔而来，顺便带了杯全糖奶茶。”',
+      '“做自己的小太阳，走到哪里都是晴天。”',
+      '“心里的欢喜像打翻了的汽水，咕噜咕噜冒着甜泡。”'
+    ],
+    todos: ['认真炫一口甜品', '听一首轻快节奏的歌', '对镜子里的自己笑一下']
+  },
+  chill: {
+    tag: '佛系摸鱼',
+    energyTitle: '🍵 悠闲摸鱼指数',
+    energyVal: 78,
+    quotes: [
+      '“不慌不忙，心平气和，天塌下来有高个子顶着。”',
+      '“偶尔发呆，是对繁忙大脑最温柔的重启。”',
+      '“只要我躺得够平，生活的困难就打不到我。”',
+      '“今日宜：慢吞吞、喝热茶、听微风吹过树梢。”'
+    ],
+    todos: ['泡一杯温热的大麦茶', '站在窗边发呆 5 分钟', '准点收拾包包回家']
+  },
+  tired: {
+    tag: '电量告急',
+    energyTitle: '🪫 剩余续航电量',
+    energyVal: 18,
+    quotes: [
+      '“正在低电量保护模式运行，请勿拍打喂食。”',
+      '“世界很大，但我现在只想缩进被窝里充会儿电。”',
+      '“今日营业时间已过，明日请赶早～”',
+      '“大脑已经下班，剩下的全靠本能在敲键盘。”'
+    ],
+    todos: ['拒绝任何额外的内耗', '洗个热气腾腾的热水澡', '今晚 10 点准时钻进被窝']
+  },
+  rage: {
+    tag: '炸毛暴走',
+    energyTitle: '🔥 暴躁沸腾指数',
+    energyVal: 88,
+    quotes: [
+      '“别惹我，我现在的怒气值能烤熟两串大鸡翅！”',
+      '“深呼吸，世界如此美妙，我不生气...才怪！”',
+      '“谁也别跟我讲大道理，我现在就是移动的道理。”',
+      '“头顶正在冒烟，需要三盒冰淇淋才能灭火！”'
+    ],
+    todos: ['狠狠嚼两块无糖薄荷糖', '听一首重金属摇滚排毒', '把烦心事画成猪头撕掉']
+  },
+  curious: {
+    tag: '脑洞大开',
+    energyTitle: '🛸 灵感活跃程度',
+    energyVal: 95,
+    quotes: [
+      '“如果猫咪会说话，第一句肯定是在吐槽人类。”',
+      '“保持好奇，保持对奇怪未知事物的心动。”',
+      '“今天有100个荒谬新想法，准备实现第101个。”',
+      '“搭乘思绪的飞船，去宇宙尽头吃一口彩虹云朵。”'
+    ],
+    todos: ['在便签上写下一个荒谬脑洞', '探索一条从未走过的小路', '观察云朵到底像不像小狗']
+  },
+  cozy: {
+    tag: '想睡大觉',
+    energyTitle: '🌙 睡眠充能意愿',
+    energyVal: 40,
+    quotes: [
+      '“把今天的所有疲惫留在门外，安心入眠吧。”',
+      '“月亮不睡我不睡，我是人间小美味...好吧先睡了。”',
+      '“裹紧小被子，在梦里去见想见的人和风景。”',
+      '“晚安，愿今夜的梦里有棉花糖和微风。”'
+    ],
+    todos: ['点上一盏暖黄色的床头灯', '换上一套软绵绵的睡衣', '闭上眼睛放空所有思绪']
+  }
+};
+
+/* ─────────────────────────────────────────────────────────────
+   5. 小人手绘渲染引擎 (Rich Props, Poses, Clothes, Accessories)
+   ───────────────────────────────────────────────────────────── */
+function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  const H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const rng = rngFrom(seedStr);
+  const colors = getComputedThemeColors();
+
+  const cx = W / 2;
+  const cy = H / 2 + 6 + animY;
+
+  // 1. 地面投影与手绘涂鸦地面
+  strokePts(ctx, rng, [
+    [cx - 85, cy + 155],
+    [cx - 20, cy + 158],
+    [cx + 35, cy + 154],
+    [cx + 85, cy + 156]
+  ], { w: 3.2, wob: 2.2, color: colors.ink, alpha: 0.35 });
+
+  // 2. 道具 (手持物品：咖啡杯 / 手机 / 气球 / 雨伞 / 猫咪)
+  const propType = Math.floor(rng() * 5);
+
+  // 3. 身体与服装
+  const bodyW = 76 + jit(rng, 6);
+  const bodyH = 88 + jit(rng, 6);
+  const bodyTop = cy + 14;
+  const outfitStyle = Math.floor(rng() * 3); // 0: 连衣裙/长卫衣, 1: 背带裤, 2: T恤+短裤
+
+  const bodyPts = [
+    [cx - bodyW * 0.72, bodyTop],
+    [cx + bodyW * 0.72, bodyTop],
+    [cx + bodyW * 0.92, bodyTop + bodyH],
+    [cx - bodyW * 0.92, bodyTop + bodyH]
+  ];
+
+  polyFill(ctx, rng, bodyPts, colors.paper);
+  polyFill(ctx, rng, bodyPts, colors.accent, 0.22);
+  strokePts(ctx, rng, bodyPts, { w: 3.6, close: true, color: colors.ink });
+
+  // 服装细节
+  if (outfitStyle === 0) {
+    // 条纹
+    for (let y = bodyTop + 20; y < bodyTop + bodyH - 8; y += 18) {
+      line(ctx, rng, cx - bodyW * 0.75, y, cx + bodyW * 0.75, y, { w: 2.2, color: colors.ink, alpha: 0.5 });
+    }
+  } else if (outfitStyle === 1) {
+    // 背带裤两条背带 + 胸前小口袋
+    line(ctx, rng, cx - 18, bodyTop, cx - 18, bodyTop + 35, { w: 3, color: colors.ink });
+    line(ctx, rng, cx + 18, bodyTop, cx + 18, bodyTop + 35, { w: 3, color: colors.ink });
+    const pocket = [
+      [cx - 14, bodyTop + 34],
+      [cx + 14, bodyTop + 34],
+      [cx + 14, bodyTop + 54],
+      [cx - 14, bodyTop + 54]
+    ];
+    polyFill(ctx, rng, pocket, colors.accent, 0.4);
+    strokePts(ctx, rng, pocket, { w: 2.2, close: true, color: colors.ink });
+  } else {
+    // 领带 / 领结
+    strokePts(ctx, rng, [[cx - 8, bodyTop + 6], [cx + 8, bodyTop + 6], [cx, bodyTop + 14]], { w: 2.2, close: true, color: colors.ink });
+    strokePts(ctx, rng, [[cx - 6, bodyTop + 14], [cx + 6, bodyTop + 14], [cx, bodyTop + 36]], { w: 2.2, close: true, color: colors.ink });
+  }
+
+  // 4. 双腿与鞋子
+  const legY0 = bodyTop + bodyH;
+  const legY1 = legY0 + 46;
+  line(ctx, rng, cx - 26, legY0, cx - 30, legY1, { w: 4, color: colors.ink });
+  blobFill(ctx, rng, cx - 36, legY1 + 4, 12, 7, colors.ink);
+  line(ctx, rng, cx + 26, legY0, cx + 30, legY1, { w: 4, color: colors.ink });
+  blobFill(ctx, rng, cx + 40, legY1 + 4, 12, 7, colors.ink);
+
+  // 5. 手臂与道具姿态
+  const shoulderY = bodyTop + 12;
+
+  if (moodKey === 'happy') {
+    // 双手欢呼 + 手持小气球
+    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 1.15, shoulderY - 38, { w: 3.6, color: colors.ink });
+    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 1.15, shoulderY - 38, { w: 3.6, color: colors.ink });
+    // 气球
+    const bx = cx + bodyW * 1.25, by = shoulderY - 70;
+    line(ctx, rng, cx + bodyW * 1.15, shoulderY - 38, bx, by + 18, { w: 1.8, color: colors.ink });
+    blobFill(ctx, rng, bx, by, 16, 20, colors.accent, 0.85);
+    strokePts(ctx, rng, ellipsePts(bx, by, 16, 20, 14), { w: 2.5, close: true, color: colors.ink });
+  } else if (moodKey === 'chill') {
+    // 一手叉腰，一手端热咖啡杯
+    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 0.95, shoulderY + 22, { w: 3.6, color: colors.ink });
+    line(ctx, rng, cx - bodyW * 0.95, shoulderY + 22, cx - bodyW * 0.65, shoulderY + 44, { w: 3.6, color: colors.ink });
+    // 端咖啡的手
+    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 1.05, shoulderY + 18, { w: 3.6, color: colors.ink });
+    // 咖啡杯
+    const mx = cx + bodyW * 1.15, my = shoulderY + 18;
+    const cup = [[mx - 7, my - 6], [mx + 7, my - 6], [mx + 5, my + 8], [mx - 5, my + 8]];
+    polyFill(ctx, rng, cup, colors.paper);
+    strokePts(ctx, rng, cup, { w: 2.2, close: true, color: colors.ink });
+    // 咖啡热气
+    line(ctx, rng, mx - 2, my - 9, mx - 2, my - 16, { w: 1.8, color: colors.accent });
+    line(ctx, rng, mx + 2, my - 9, mx + 2, my - 16, { w: 1.8, color: colors.accent });
+  } else if (moodKey === 'rage') {
+    // 双手叉腰炸毛
+    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 1.05, shoulderY + 20, { w: 3.8, color: colors.ink });
+    line(ctx, rng, cx - bodyW * 1.05, shoulderY + 20, cx - bodyW * 0.65, shoulderY + 44, { w: 3.8, color: colors.ink });
+    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 1.05, shoulderY + 20, { w: 3.8, color: colors.ink });
+    line(ctx, rng, cx + bodyW * 1.05, shoulderY + 20, cx + bodyW * 0.65, shoulderY + 44, { w: 3.8, color: colors.ink });
+  } else if (moodKey === 'curious') {
+    // 一手托下巴，一手拿放大镜
+    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 0.85, shoulderY + 28, { w: 3.6, color: colors.ink });
+    line(ctx, rng, cx - bodyW * 0.85, shoulderY + 28, cx - 12, shoulderY - 8, { w: 3.6, color: colors.ink });
+    // 放大镜
+    const lx = cx + bodyW * 0.95, ly = shoulderY + 10;
+    line(ctx, rng, cx + bodyW * 0.68, shoulderY, lx, ly, { w: 3.6, color: colors.ink });
+    strokePts(ctx, rng, ellipsePts(lx + 8, ly - 8, 11, 11, 12), { w: 2.5, close: true, color: colors.accent });
+    line(ctx, rng, lx + 16, ly, lx + 24, ly + 8, { w: 3, color: colors.ink });
+  } else {
+    // 默认微摆
+    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 0.9, shoulderY + 38, { w: 3.6, color: colors.ink });
+    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 0.9, shoulderY + 38, { w: 3.6, color: colors.ink });
+  }
+
+  // 6. 头部
+  const headR = 58 + jit(rng, 5);
+  const headCY = cy - 60;
+  blobFill(ctx, rng, cx, headCY, headR, headR * 0.96, colors.paper);
+  strokePts(ctx, rng, ellipsePts(cx, headCY, headR, headR * 0.96, 16), { w: 3.8, close: true, color: colors.ink });
+
+  // 腮红
+  blobFill(ctx, rng, cx - headR * 0.58, headCY + 15, 11, 7, '#f59e9e', 0.55);
+  blobFill(ctx, rng, cx + headR * 0.58, headCY + 15, 11, 7, '#f59e9e', 0.55);
+
+  // 7. 发型与头饰 (5 种丰富款型)
+  const hairStyle = Math.floor(rng() * 6);
+  if (hairStyle === 0) {
+    // 可爱豆芽/呆毛
+    line(ctx, rng, cx, headCY - headR, cx - 12, headCY - headR - 28, { w: 3.5, color: colors.ink });
+    line(ctx, rng, cx + 4, headCY - headR, cx + 16, headCY - headR - 24, { w: 3.2, color: colors.ink });
+    blobFill(ctx, rng, cx - 14, headCY - headR - 28, 5, 4, colors.accent);
+  } else if (hairStyle === 1) {
+    // 齐刘海
+    const hairPts = ellipsePts(cx, headCY, headR * 1.04, headR * 1.04, 14, Math.PI * 0.88, Math.PI * 2.12);
+    strokePts(ctx, rng, hairPts, { w: 5, color: colors.ink });
+  } else if (hairStyle === 2) {
+    // 蓬松卷卷头
+    for (let angle = Math.PI * 0.78; angle <= Math.PI * 2.22; angle += 0.28) {
+      const hx = cx + Math.cos(angle) * (headR + 8);
+      const hy = headCY + Math.sin(angle) * (headR + 8);
+      blobFill(ctx, rng, hx, hy, 13, 13, colors.ink, 0.88);
+    }
+  } else if (hairStyle === 3) {
+    // 贝雷帽 / 画家帽
+    const hatPts = [
+      [cx - headR * 0.9, headCY - headR * 0.45],
+      [cx + headR * 0.9, headCY - headR * 0.75],
+      [cx + headR * 0.45, headCY - headR * 1.25],
+      [cx - headR * 0.65, headCY - headR * 1.05]
+    ];
+    polyFill(ctx, rng, hatPts, colors.accent);
+    strokePts(ctx, rng, hatPts, { w: 3.2, close: true, color: colors.ink });
+    blobFill(ctx, rng, cx, headCY - headR * 1.2, 7, 7, colors.paper);
+    strokePts(ctx, rng, ellipsePts(cx, headCY - headR * 1.2, 7, 7), { w: 2, close: true, color: colors.ink });
+  } else if (hairStyle === 4) {
+    // 双丸子头 / 揪揪
+    blobFill(ctx, rng, cx - headR * 0.8, headCY - headR * 0.7, 14, 14, colors.ink, 0.88);
+    blobFill(ctx, rng, cx + headR * 0.8, headCY - headR * 0.7, 14, 14, colors.ink, 0.88);
+  } else {
+    // 头戴大耳机 (Music vibe)
+    const headBand = ellipsePts(cx, headCY, headR * 1.15, headR * 1.15, 12, Math.PI * 1.1, Math.PI * 1.9);
+    strokePts(ctx, rng, headBand, { w: 4, color: colors.ink });
+    blobFill(ctx, rng, cx - headR * 1.05, headCY + 2, 12, 18, colors.accent);
+    strokePts(ctx, rng, ellipsePts(cx - headR * 1.05, headCY + 2, 12, 18, 8), { w: 2.5, close: true, color: colors.ink });
+    blobFill(ctx, rng, cx + headR * 1.05, headCY + 2, 12, 18, colors.accent);
+    strokePts(ctx, rng, ellipsePts(cx + headR * 1.05, headCY + 2, 12, 18, 8), { w: 2.5, close: true, color: colors.ink });
+  }
+
+  // 8. 眼睛与神态 (完美结合心情与手绘质感)
+  const eyeSpan = 21 + jit(rng, 3);
+  const eyeY = headCY + 2;
+
+  if (moodKey === 'happy') {
+    // 弯弯笑眼 ^ ^
+    strokePts(ctx, rng, ellipsePts(cx - eyeSpan, eyeY, 10, 8, 6, Math.PI + 0.3, Math.PI * 2 - 0.3), { w: 3.5, color: colors.ink });
+    strokePts(ctx, rng, ellipsePts(cx + eyeSpan, eyeY, 10, 8, 6, Math.PI + 0.3, Math.PI * 2 - 0.3), { w: 3.5, color: colors.ink });
+    // 开心大嘴
+    strokePts(ctx, rng, ellipsePts(cx, eyeY + 15, 13, 9, 8, 0.2, Math.PI - 0.2), { w: 3.2, close: true, color: colors.ink });
+    blobFill(ctx, rng, cx, eyeY + 18, 8, 5, '#e06d6d');
+  } else if (moodKey === 'tired') {
+    // 疲惫豆豆眼 / 一字眼
+    line(ctx, rng, cx - eyeSpan - 9, eyeY, cx - eyeSpan + 9, eyeY, { w: 3.8, color: colors.ink });
+    line(ctx, rng, cx + eyeSpan - 9, eyeY, cx + eyeSpan + 9, eyeY, { w: 3.8, color: colors.ink });
+    line(ctx, rng, cx - 9, eyeY + 20, cx + 9, eyeY + 18, { w: 2.8, color: colors.ink });
+  } else if (moodKey === 'rage') {
+    // 愤怒斜眉
+    line(ctx, rng, cx - eyeSpan - 9, eyeY - 6, cx - eyeSpan + 7, eyeY + 2, { w: 3.8, color: colors.ink });
+    line(ctx, rng, cx + eyeSpan + 9, eyeY - 6, cx + eyeSpan - 7, eyeY + 2, { w: 3.8, color: colors.ink });
+    const zx = cx - 11, zy = eyeY + 20;
+    strokePts(ctx, rng, [[zx, zy], [zx+5, zy-4], [zx+10, zy+4], [zx+15, zy-4], [zx+20, zy]], { w: 2.8, color: colors.ink });
+  } else if (moodKey === 'cozy') {
+    // 闭目安睡
+    strokePts(ctx, rng, ellipsePts(cx - eyeSpan, eyeY + 2, 9, 6, 6, 0.3, Math.PI - 0.3), { w: 3.2, color: colors.ink });
+    strokePts(ctx, rng, ellipsePts(cx + eyeSpan, eyeY + 2, 9, 6, 6, 0.3, Math.PI - 0.3), { w: 3.2, color: colors.ink });
+    strokePts(ctx, rng, ellipsePts(cx, eyeY + 15, 7, 4, 6, 0.3, Math.PI - 0.3), { w: 2.6, color: colors.ink });
+  } else {
+    // 灵动大圆眼
+    blobFill(ctx, rng, cx - eyeSpan, eyeY, 6, 6, colors.ink);
+    blobFill(ctx, rng, cx - eyeSpan - 2, eyeY - 2, 2, 2, '#fff');
+    blobFill(ctx, rng, cx + eyeSpan, eyeY, 6, 6, colors.ink);
+    blobFill(ctx, rng, cx + eyeSpan - 2, eyeY - 2, 2, 2, '#fff');
+    strokePts(ctx, rng, ellipsePts(cx, eyeY + 15, 9, 6, 6, 0.3, Math.PI - 0.3), { w: 2.8, color: colors.ink });
+  }
+
+  // 9. 情绪漂浮特效元素
+  if (moodKey === 'happy') {
+    drawHandDrawnStar(ctx, rng, cx + headR * 0.9, headCY - headR * 0.5, 12, colors);
+    drawHandDrawnStar(ctx, rng, cx - headR * 0.85, headCY - headR * 0.3, 8, colors);
+  } else if (moodKey === 'tired' || moodKey === 'cozy') {
+    drawHandDrawnZzz(ctx, rng, cx + headR * 0.75, headCY - headR * 0.5, colors);
+  } else if (moodKey === 'rage') {
+    drawHandDrawnRage(ctx, rng, cx + headR * 0.75, headCY - headR * 0.5, colors);
+  } else if (moodKey === 'curious') {
+    drawHandDrawnSpark(ctx, rng, cx + headR * 0.8, headCY - headR * 0.5, colors);
+  }
+}
+
+/* 手绘特效零件 */
+function drawHandDrawnStar(ctx, rng, x, y, r, colors) {
+  const pts = [];
+  for (let i = 0; i < 8; i++) {
+    const a = i * Math.PI / 4;
+    const rad = i % 2 === 0 ? r : r * 0.45;
+    pts.push([x + Math.cos(a) * rad, y + Math.sin(a) * rad]);
+  }
+  polyFill(ctx, rng, pts, '#f5d061');
+  strokePts(ctx, rng, pts, { w: 2, close: true, color: colors.ink });
+}
+
+function drawHandDrawnZzz(ctx, rng, x, y, colors) {
+  line(ctx, rng, x, y, x + 13, y, { w: 2.6, color: colors.ink });
+  line(ctx, rng, x + 13, y, x, y + 13, { w: 2.6, color: colors.ink });
+  line(ctx, rng, x, y + 13, x + 13, y + 13, { w: 2.6, color: colors.ink });
+}
+
+function drawHandDrawnRage(ctx, rng, x, y, colors) {
+  line(ctx, rng, x - 7, y, x + 7, y, { w: 3, color: '#c43a3a' });
+  line(ctx, rng, x, y - 7, x, y + 7, { w: 3, color: '#c43a3a' });
+}
+
+function drawHandDrawnSpark(ctx, rng, x, y, colors) {
+  line(ctx, rng, x - 9, y, x + 9, y, { w: 2.4, color: colors.accent });
+  line(ctx, rng, x, y - 9, x, y + 9, { w: 2.4, color: colors.accent });
+}
+
+/* ─────────────────────────────────────────────────────────────
+   6. 手绘波浪分割线 (Wave Divider)
+   ───────────────────────────────────────────────────────────── */
+function renderWaveDivider() {
+  const waveCanvas = document.getElementById('waveCanvas');
+  const ctx = waveCanvas.getContext('2d');
+  const W = waveCanvas.width;
+  const H = waveCanvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const colors = getComputedThemeColors();
+  const rng = rngFrom('divider-wave');
+
+  const pts = [];
+  const waves = 14;
+  const step = W / waves;
+  for (let i = 0; i <= waves; i++) {
+    const x = i * step;
+    const y = H / 2 + (i % 2 === 0 ? -4 : 4);
+    pts.push([x, y]);
+  }
+  strokePts(ctx, rng, pts, { w: 2.4, wob: 1.4, color: colors.accent, alpha: 0.85 });
+}
+
+/* ─────────────────────────────────────────────────────────────
+   7. 界面状态机与事件响应
+   ───────────────────────────────────────────────────────────── */
+const avatarCanvas = document.getElementById('avatarCanvas');
+const userInput = document.getElementById('userInput');
+const dateDisplay = document.getElementById('date-display');
+const weatherDisplay = document.getElementById('weather-display');
+const weatherIcon = document.getElementById('weather-icon');
+const weatherText = document.getElementById('weather-text');
+const tagCapsule = document.getElementById('tag-capsule');
+const tagIconWrap = document.getElementById('tag-icon-wrap');
+const tagText = document.getElementById('tag-text');
+const quoteText = document.getElementById('quote-text');
+const energyTitle = document.getElementById('energy-title');
+const energyValue = document.getElementById('energy-value');
+const energyBar = document.getElementById('energy-bar');
+const todo1 = document.getElementById('todo-1');
+const todo2 = document.getElementById('todo-2');
+const todo3 = document.getElementById('todo-3');
+const authorSig = document.getElementById('author-sig');
+const moodCard = document.getElementById('mood-card');
+const avatarStage = document.getElementById('avatar-stage');
+const moodTabs = document.querySelectorAll('.mood-tab');
+const patternBtns = document.querySelectorAll('.pattern-btn');
+const themeCircles = document.querySelectorAll('.theme-circle');
+const btnRandom = document.getElementById('btn-random');
+const btnExport = document.getElementById('btn-export');
+const toast = document.getElementById('toast');
+const toastText = document.getElementById('toast-text');
+
+let currentMoodKey = 'happy';
+let currentSeed = 'seed-' + Date.now();
+
+// 初始化日期
+const now = new Date();
+dateDisplay.textContent = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
+
+function showToast(msg) {
+  toastText.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+function updateAppCard(seed, moodKey = null) {
+  currentSeed = seed || 'default';
+  const rng = rngFrom(currentSeed);
+
+  if (moodKey) {
+    currentMoodKey = moodKey;
+  } else {
+    const keys = Object.keys(MOOD_DATABASE);
+    currentMoodKey = pick(rng, keys);
+  }
+
+  const moodData = MOOD_DATABASE[currentMoodKey] || MOOD_DATABASE.happy;
+  
+  // 1. 更新情绪胶囊 & SVG 图标
+  tagIconWrap.innerHTML = SVG_ICONS[currentMoodKey] || SVG_ICONS.happy;
+  tagText.textContent = moodData.tag;
+
+  // 2. 更新金句
+  quoteText.textContent = pick(rng, moodData.quotes);
+
+  // 3. 更新能量仪表
+  energyTitle.textContent = moodData.energyTitle;
+  const energyPercent = Math.min(100, Math.max(10, moodData.energyVal + Math.round(jit(rng, 6))));
+  energyValue.textContent = `${energyPercent}%`;
+  energyBar.style.width = `${energyPercent}%`;
+
+  // 4. 更新打卡小清单
+  todo1.textContent = moodData.todos[0];
+  todo2.textContent = moodData.todos[1];
+  todo3.textContent = moodData.todos[2];
+
+  // 5. 更新天气 SVG 图标
+  const weatherObj = pick(rng, WEATHER_ITEMS);
+  weatherDisplay.innerHTML = `${weatherObj.icon} <span>${weatherObj.text}</span>`;
+
+  // 6. 更新署名
+  const authorName = userInput.value.trim();
+  authorSig.textContent = authorName ? `— @${authorName}` : '— @匿名漫游者';
+
+  // 7. 高亮当前情绪按钮
+  moodTabs.forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.mood === currentMoodKey);
+  });
+
+  // 8. 重新绘制小人 & 波浪
+  renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey);
+  renderWaveDivider();
+}
+
+/* 交互：戳一戳跳跃动画 */
+let isJumping = false;
+avatarStage.addEventListener('click', () => {
+  if (isJumping) return;
+  isJumping = true;
+  sound.playPop();
+
+  let startT = null;
+  const dur = 340;
+
+  function jump(t) {
+    if (!startT) startT = t;
+    const p = (t - startT) / dur;
+    if (p < 1) {
+      const offset = -Math.sin(p * Math.PI) * 30;
+      renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey, offset);
+      requestAnimationFrame(jump);
+    } else {
+      renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey, 0);
+      isJumping = false;
+    }
+  }
+  requestAnimationFrame(jump);
+});
+
+/* 交互：输入监听 */
+userInput.addEventListener('input', () => {
+  const val = userInput.value.trim();
+  updateAppCard(val ? `in-${val}` : 'default-seed', currentMoodKey);
+});
+
+/* 交互：情绪切换 */
+moodTabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    sound.playWoosh();
+    const mood = tab.dataset.mood;
+    const base = userInput.value.trim() || 'mood';
+    updateAppCard(`${base}-${mood}-${Math.random()}`, mood);
+  });
+});
+
+/* 交互：底纹切换 */
+patternBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    sound.playPop();
+    patternBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    const pattern = btn.dataset.pattern;
+    moodCard.className = `mood-card pattern-${pattern}`;
+  });
+});
+
+/* 交互：色彩主题切换 */
+themeCircles.forEach(circle => {
+  circle.addEventListener('click', () => {
+    sound.playPop();
+    themeCircles.forEach(c => c.classList.remove('active'));
+    circle.classList.add('active');
+
+    const theme = circle.dataset.theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    document.body.setAttribute('data-theme', theme);
+
+    setTimeout(() => {
+      renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey);
+      renderWaveDivider();
+    }, 50);
+  });
+});
+
+/* 交互：随机抽卡 */
+btnRandom.addEventListener('click', () => {
+  sound.playWoosh();
+  const randNum = Math.floor(Math.random() * 1e8);
+  const nicknames = ['摸鱼特工', '宇宙漫游者', '快乐小土豆', '失眠小熊', '打工战士', '甜筒刺客', '代码诗人', '晚风捕手'];
+  if (Math.random() > 0.45) {
+    userInput.value = pick(rngFrom(String(randNum)), nicknames);
+  }
+
+  moodCard.style.transform = 'scale(0.96) rotate(-1deg)';
+  setTimeout(() => { moodCard.style.transform = 'none'; }, 180);
+
+  updateAppCard('rand-' + randNum);
+  showToast('🎲 已抽取全新手绘心情！');
+});
+
+/* 交互：导出高保真图片 */
+btnExport.addEventListener('click', () => {
+  sound.playPop();
+  btnExport.querySelector('span').textContent = '生成中...';
+
+  html2canvas(moodCard, {
+    scale: 3,
+    backgroundColor: null,
+    useCORS: true,
+    logging: false
+  }).then(canvasOutput => {
+    const link = document.createElement('a');
+    link.download = `mood-journal-${Date.now()}.png`;
+    link.href = canvasOutput.toDataURL('image/png');
+    link.click();
+
+    btnExport.querySelector('span').textContent = '保存手账';
+    showToast('🎉 卡片高清大图已下载！');
+  }).catch(err => {
+    btnExport.querySelector('span').textContent = '保存手账';
+    showToast('保存失败，请稍后重试');
+  });
+});
+
+// 初始化首次渲染
+updateAppCard('init-' + Date.now());
+</script>
+</body>
+</html>
