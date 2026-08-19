@@ -116,6 +116,16 @@
     --card-shadow: 6px 8px 0px var(--hw-ink);
   }
 
+  /* 彩蛋模式金色锦鲤主题 */
+  html[data-egg="koi"] {
+    --hw-card-bg: #FFFDF0 !important;
+    --hw-accent: #E5A93B !important;
+    --hw-accent-ink: #B87C14 !important;
+    --hw-accent-bg: rgba(229, 169, 59, 0.22) !important;
+    --hw-stamp: #E5A93B !important;
+    --card-shadow: 0 0 20px rgba(229, 169, 59, 0.6), 6px 8px 0px #3D2B12 !important;
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
@@ -134,7 +144,96 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     2. 好友分享裂变横幅 (Viral Friend Banner)
+     2. 社交一键分享微信/小红书引导蒙层 (Share Guide Modal)
+     ───────────────────────────────────────────────────────────── */
+  .share-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 25, 20, 0.85);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .share-mask.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .wechat-arrow {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    width: 80px;
+    height: 80px;
+    animation: bounceArrow 1s infinite alternate ease-in-out;
+  }
+
+  @keyframes bounceArrow {
+    0% { transform: translateY(0) rotate(-10deg); }
+    100% { transform: translateY(-10px) rotate(5deg); }
+  }
+
+  .share-dialog {
+    background: var(--hw-paper);
+    border: 3px solid var(--hw-ink);
+    border-radius: 20px;
+    padding: 24px 20px;
+    max-width: 360px;
+    width: 100%;
+    box-shadow: 6px 8px 0 rgba(0,0,0,0.5);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    color: var(--hw-ink);
+  }
+
+  .share-dialog h3 {
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .share-dialog p {
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--hw-ink-soft);
+  }
+
+  .dialog-close-btn {
+    background: var(--hw-accent);
+    color: #fff;
+    border: 2px solid var(--hw-ink);
+    border-radius: 12px;
+    padding: 10px 0;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 2px 3px 0 var(--hw-ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .dialog-close-btn:active {
+    transform: translate(2px, 3px);
+    box-shadow: 0 0 0;
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     3. 好友分享裂变横幅 (Viral Friend Banner)
      ───────────────────────────────────────────────────────────── */
   .friend-banner {
     width: 100%;
@@ -169,19 +268,17 @@
     cursor: pointer;
     box-shadow: 1px 2px 0 var(--hw-ink);
     white-space: nowrap;
-  }
-
-  .banner-btn:active {
-    transform: translate(1px, 1px);
-    box-shadow: 0 0 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   /* ─────────────────────────────────────────────────────────────
-     3. 顶部品牌与氛围
+     4. 顶部品牌与氛围
      ───────────────────────────────────────────────────────────── */
   .app-header {
     text-align: center;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     max-width: 480px;
     width: 100%;
   }
@@ -226,8 +323,10 @@
   }
 
   .visitor-pill {
-    display: inline-block;
-    margin-top: 5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 4px;
     font-size: 12px;
     color: var(--hw-ink-soft);
     background: var(--hw-paper);
@@ -237,14 +336,14 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     4. 核心手账卡片 (Polaroid & Poster Aspect Architecture)
+     5. 核心手账卡片
      ───────────────────────────────────────────────────────────── */
   .app-layout {
     width: 100%;
     max-width: 440px;
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 16px;
     align-items: center;
   }
 
@@ -265,11 +364,6 @@
     align-items: center;
     transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     overflow: hidden;
-  }
-
-  /* 宽高画幅适配 (小红书 3:4 vs 朋友圈海报 9:16) */
-  .mood-card.ratio-poster {
-    padding-bottom: 26px;
   }
 
   /* 背景底纹 */
@@ -362,6 +456,8 @@
     border-radius: 50%;
     background: radial-gradient(circle, var(--hw-accent-bg) 0%, transparent 72%);
     transition: transform 0.15s;
+    user-select: none;
+    -webkit-user-select: none;
   }
 
   .stage-box:hover .poke-badge {
@@ -402,6 +498,9 @@
     margin-bottom: 6px;
     font-weight: bold;
     border: 1px dashed var(--hw-accent);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
   }
 
   .tag-capsule {
@@ -438,10 +537,7 @@
     font-weight: 600;
   }
 
-  /* ─────────────────────────────────────────────────────────────
-     5. 社交病毒式组件 (宜忌便签 + 能量条 + 裂变二维码)
-     ───────────────────────────────────────────────────────────── */
-  /* 今日宜忌手账标签 (Viral Yi & Ji Sticky Notes) */
+  /* 宜忌便签 */
   .fortune-row {
     width: 100%;
     display: grid;
@@ -503,6 +599,12 @@
     color: var(--hw-ink-soft);
   }
 
+  .energy-header-left {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
   .energy-track {
     width: 100%;
     height: 11px;
@@ -534,7 +636,7 @@
     margin-bottom: 6px;
   }
 
-  /* 卡片底部栏: 署名 + 裂变专属二维码 */
+  /* 卡片底部栏 */
   .card-bottom-bar {
     width: 100%;
     display: flex;
@@ -561,7 +663,7 @@
     color: var(--hw-ink-soft);
   }
 
-  /* 核心裂变二维码容器 (Scan To Generate) */
+  /* 裂变二维码 */
   .qr-stamp-box {
     display: flex;
     align-items: center;
@@ -597,7 +699,7 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     6. 传播裂变操作面板 (Viral Action Deck)
+     6. 控制操作面板 (一键发朋友圈 / 小红书 / 抽盲盒 / 保存)
      ───────────────────────────────────────────────────────────── */
   .ctrl-panel {
     width: 100%;
@@ -608,7 +710,7 @@
     box-shadow: 4px 5px 0 var(--hw-ink);
     display: flex;
     flex-direction: column;
-    gap: 13px;
+    gap: 12px;
   }
 
   .input-wrapper {
@@ -677,7 +779,7 @@
     font-weight: bold;
   }
 
-  /* 纸张底纹 & 色板 & 画幅 */
+  /* 纸张底纹 & 色板 */
   .custom-options-row {
     display: flex;
     justify-content: space-between;
@@ -727,22 +829,63 @@
     border-radius: 50%;
   }
 
-  /* 主要动作按钮组 (一键抽卡 \ 一键保存 \ 社交文案 \ 分享链接) */
-  .button-row {
-    display: flex;
-    gap: 8px;
+  /* 核心动作按钮区 */
+  .share-direct-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
   }
 
-  .main-btn {
-    flex: 1;
+  .share-action-btn {
     height: 48px;
     font-family: inherit;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: bold;
-    background: var(--hw-paper);
     border: 2.5px solid var(--hw-ink);
     border-radius: 12px;
     box-shadow: 3px 4px 0 var(--hw-ink);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.1s;
+    color: #fff;
+  }
+
+  .share-action-btn:active {
+    transform: translate(3px, 4px);
+    box-shadow: 0 0 0;
+  }
+
+  /* 微信朋友圈专属绿 */
+  .btn-wechat {
+    background: #07C160;
+    border-color: #058843;
+  }
+
+  /* 小红书专属红 */
+  .btn-xiaohongshu {
+    background: #FF2442;
+    border-color: #C20D26;
+  }
+
+  /* 辅助动作按钮组 */
+  .sub-action-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .sub-btn {
+    height: 44px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: bold;
+    background: var(--hw-paper);
+    border: 2px solid var(--hw-ink);
+    border-radius: 10px;
+    box-shadow: 2px 3px 0 var(--hw-ink);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -752,49 +895,14 @@
     transition: all 0.1s;
   }
 
-  .main-btn:active {
-    transform: translate(3px, 4px);
+  .sub-btn:active {
+    transform: translate(2px, 3px);
     box-shadow: 0 0 0;
   }
 
-  .btn-accent {
-    background: var(--hw-accent);
-    color: #fff;
-  }
-  .btn-accent:active { background: var(--hw-accent-ink); }
-
-  .btn-viral {
+  .btn-blindbox {
     background: #FFE082;
     color: #4E342E;
-  }
-
-  .viral-sub-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .sub-btn {
-    height: 40px;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: bold;
-    background: var(--hw-paper-tint);
-    border: 2px solid var(--hw-ink);
-    border-radius: 10px;
-    box-shadow: 2px 2px 0 var(--hw-ink);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    color: var(--hw-ink);
-    transition: all 0.1s;
-  }
-
-  .sub-btn:active {
-    transform: translate(2px, 2px);
-    box-shadow: 0 0 0;
   }
 
   .footer-tip {
@@ -819,7 +927,7 @@
     box-shadow: 0 6px 16px rgba(0,0,0,0.25);
     opacity: 0;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    z-index: 999;
+    z-index: 99999;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -835,33 +943,80 @@
 
 <body>
 
-  <!-- 浮动 Toast -->
+  <!-- 浮动 Toast (纯 SVG 矢量) -->
   <div class="toast-box" id="toast">
     <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
     <span id="toast-text">卡片已就绪</span>
   </div>
 
-  <!-- 好友分享识别横幅 (从好友链接打开时自动展现) -->
+  <!-- 微信一键分享指引蒙层 -->
+  <div class="share-mask" id="wechat-mask">
+    <svg class="wechat-arrow" viewBox="0 0 100 100" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round">
+      <path d="M20 80 Q 50 20 80 15"/>
+      <path d="M60 10 L 80 15 L 75 35"/>
+    </svg>
+    <div class="share-dialog">
+      <h3>
+        <svg class="svg-icon" style="color:#07C160;width:22px;height:22px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+        <span>微信一键分享</span>
+      </h3>
+      <p>点击右上角 <b>「···」</b><br>即可将今日手绘卡片 <b>「分享到朋友圈」</b> 或 <b>「发送给好友」</b>！</p>
+      <button class="dialog-close-btn" id="btn-close-wechat-mask">
+        <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>我知道啦</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 小红书一键分享指引弹窗 -->
+  <div class="share-mask" id="xhs-mask">
+    <div class="share-dialog">
+      <h3 style="color:#FF2442;">
+        <svg class="svg-icon" style="color:#FF2442;width:22px;height:22px;" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 12h8M12 8v8"/></svg>
+        <span>小红书一键发布</span>
+      </h3>
+      <p>已为你生成 <b>3:4 小红书专属尺寸卡片</b>！<br>长按保存图片或直接唤起发布笔记～</p>
+      <div id="xhs-preview-box" style="width:100%;max-height:180px;overflow:hidden;border-radius:8px;border:1.5px dashed #FF2442;display:flex;align-items:center;justify-content:center;background:#fafafa;">
+        <span style="font-size:12px;color:#888;">卡片渲染中...</span>
+      </div>
+      <button class="dialog-close-btn" style="background:#FF2442;" id="btn-xhs-direct-share">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span>保存卡片并复制爆款标签</span>
+      </button>
+      <button class="dialog-close-btn" style="background:#eee;color:#333;border-color:#ccc;box-shadow:none;" id="btn-close-xhs-mask">返回</button>
+    </div>
+  </div>
+
+  <!-- 好友分享识别横幅 -->
   <div class="friend-banner" id="friend-banner" style="display: none;">
     <div style="display: flex; align-items: center; gap: 6px;">
-      <span>🎁</span>
+      <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
       <span id="friend-banner-text">你正在查看好友的今日手绘心情！</span>
     </div>
-    <button class="banner-btn" id="btn-make-my-own">我也测一个 ➜</button>
+    <button class="banner-btn" id="btn-make-my-own">
+      <span>我也测一个</span>
+      <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+    </button>
   </div>
 
   <!-- 头部品牌 -->
   <header class="app-header">
     <div class="brand-pill">
       <svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-      <span>MoodHand 情绪手账 2.0</span>
+      <span>MoodHand Visual System</span>
     </div>
-    <h1 class="app-title">🎭 今日精神状态诊断书</h1>
+    <h1 class="app-title">
+      <svg class="svg-icon" style="width:30px;height:30px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+      <span>今日精神状态诊断书</span>
+    </h1>
     <p class="app-subtitle">手绘小人图鉴 · 能量电量 · 运势宜忌 · 一键生成</p>
-    <div class="visitor-pill" id="visitor-badge">✨ 今日已有 <b id="random-visitor-count">1,829</b> 位漫游者领取心情</div>
+    <div class="visitor-pill" id="visitor-badge">
+      <svg class="svg-icon" style="width:13px;height:13px;" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+      <span>今日已有 <b id="random-visitor-count">2,389</b> 位漫游者领取心情</span>
+    </div>
   </header>
 
-  <!-- 主体卡片区域 (可整张高保真导出) -->
+  <!-- 主体卡片区域 -->
   <main class="app-layout">
     
     <div class="card-container">
@@ -881,18 +1036,21 @@
         </div>
 
         <!-- 情绪人格物种称号 -->
-        <div class="persona-badge" id="persona-badge">🛸 情绪物种：宇宙漫游级快乐土豆</div>
+        <div class="persona-badge" id="persona-badge">
+          <svg class="svg-icon" style="width:14px;height:14px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+          <span id="persona-text">情绪物种：宇宙漫游级快乐土豆</span>
+        </div>
 
-        <!-- 手绘小人舞台 (支持戳一戳互动与丰富道具) -->
-        <div class="stage-box" id="avatar-stage" title="戳一下互动！">
+        <!-- 手绘小人舞台 (长按有心动彩蛋，连戳5次有晕厥彩蛋，连戳10次有锦鲤彩蛋) -->
+        <div class="stage-box" id="avatar-stage" title="连戳我有隐藏彩蛋哦！">
           <canvas class="doodle-canvas" id="avatarCanvas" width="480" height="480"></canvas>
-          <div class="poke-badge">
+          <div class="poke-badge" id="stage-badge">
             <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
-            <span>戳一戳蹦跶</span>
+            <span id="poke-tip-text">戳戳我有彩蛋</span>
           </div>
         </div>
 
-        <!-- 情绪标签胶囊 (带有精美 SVG 图标) -->
+        <!-- 情绪标签胶囊 -->
         <div class="tag-capsule" id="tag-capsule">
           <span id="tag-icon-wrap"></span>
           <span id="tag-text">快乐放空中</span>
@@ -903,7 +1061,7 @@
           <p class="quote-phrase" id="quote-text">“生活明朗，万物可爱，今天心情有八颗星！”</p>
         </div>
 
-        <!-- 今日宜忌手账标签 (Viral Yi & Ji) -->
+        <!-- 今日宜忌手账标签 -->
         <div class="fortune-row">
           <div class="fortune-box do-box">
             <div class="fortune-head do-text">
@@ -924,7 +1082,10 @@
         <!-- 状态能量仪表槽 -->
         <div class="energy-widget">
           <div class="energy-header">
-            <span id="energy-title">⚡ 精神能量电量</span>
+            <div class="energy-header-left">
+              <svg class="svg-icon" style="width:14px;height:14px;" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span id="energy-title">精神能量电量</span>
+            </div>
             <span id="energy-value">85%</span>
           </div>
           <div class="energy-track">
@@ -942,7 +1103,7 @@
             <div class="card-hint-sub">MoodHand 手账 · 每日心境记录</div>
           </div>
           
-          <!-- 裂变二维码：扫描直接打开当前卡片，促进二次传播 -->
+          <!-- 裂变二维码 -->
           <div class="qr-stamp-box" title="扫码生成同款手账">
             <div class="qr-code-img" id="card-qrcode"></div>
             <div class="qr-text">
@@ -955,14 +1116,14 @@
       </article>
     </div>
 
-    <!-- 用户操作面板 (裂变引擎) -->
+    <!-- 用户操作面板 -->
     <section class="ctrl-panel">
-      <!-- 文本输入 -->
+      <!-- 文本输入 (支持猫/暴富/咖啡等彩蛋词) -->
       <div class="input-wrapper">
-        <input type="text" id="userInput" class="sketch-input" placeholder="输入昵称 / 此时此刻的碎碎念..." maxlength="25" autocomplete="off">
+        <input type="text" id="userInput" class="sketch-input" placeholder="输入昵称 (试输入'猫咪' / '暴富' / '咖啡'有彩蛋)..." maxlength="25" autocomplete="off">
       </div>
 
-      <!-- 情绪选择器 (6 种维度) -->
+      <!-- 情绪选择器 -->
       <div>
         <div class="panel-section-title">
           <span>选择心境状态</span>
@@ -996,7 +1157,7 @@
         </div>
       </div>
 
-      <!-- 纸张底纹 & 色板 & 画幅比例 -->
+      <!-- 纸张底纹 & 色板 -->
       <div class="custom-options-row">
         <div>
           <div class="panel-section-title" style="margin-bottom:3px;"><span>底纹</span></div>
@@ -1020,32 +1181,33 @@
         </div>
       </div>
 
-      <!-- 核心动作按钮 -->
-      <div class="button-row">
-        <button class="main-btn btn-viral" id="btn-random">
-          <svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="16" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="8" cy="16" r="1.5"/></svg>
-          <span>🎲 抽今日盲盒</span>
+      <!-- 一键分享到微信朋友圈 & 小红书核心按钮 (SVG 图标) -->
+      <div class="share-direct-grid">
+        <button class="share-action-btn btn-wechat" id="btn-share-wechat">
+          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm7 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.42 3.84 7.02L5 22l4.24-2.12c.88.24 1.8.37 2.76.37 5.52 0 10-4.03 10-9s-4.48-9-10-9z"/></svg>
+          <span>一键发朋友圈</span>
         </button>
-        <button class="main-btn btn-accent" id="btn-export">
-          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          <span>📸 保存拍立得</span>
+
+        <button class="share-action-btn btn-xiaohongshu" id="btn-share-xhs">
+          <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 12h8M12 8v8"/></svg>
+          <span>一键发小红书</span>
         </button>
       </div>
 
-      <!-- 社交传播裂变辅助按钮 (复制文案 / 复制分享链接) -->
-      <div class="viral-sub-row">
-        <button class="sub-btn" id="btn-copy-copywriting">
-          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          <span>📋 复制朋友圈文案</span>
+      <!-- 辅助功能：抽盲盒 & 保存拍立得 (SVG 图标) -->
+      <div class="sub-action-row">
+        <button class="sub-btn btn-blindbox" id="btn-random">
+          <svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="16" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="8" cy="16" r="1.5"/></svg>
+          <span>抽今日盲盒</span>
         </button>
-        <button class="sub-btn" id="btn-share-link">
-          <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-          <span>🔗 分享专属卡片</span>
+        <button class="sub-btn" id="btn-export">
+          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>保存卡片图片</span>
         </button>
       </div>
 
       <div class="footer-tip">
-        卡片自带动态溯源二维码 · 随时随地记录与分享你的小情绪
+        小提示：连续快速戳小人 5 次或 10 次，可解锁神秘隐藏彩蛋！
       </div>
     </section>
 
@@ -1125,6 +1287,26 @@ class SoundEngine {
       gain.connect(this.ctx.destination);
       osc.start();
       osc.stop(this.ctx.currentTime + 0.12);
+    } catch(e) {}
+  }
+  playMagic() {
+    try {
+      this.init();
+      if (!this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, i) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + i * 0.06);
+        gain.gain.setValueAtTime(0.12, this.ctx.currentTime + i * 0.06);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + i * 0.06 + 0.25);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(this.ctx.currentTime + i * 0.06);
+        osc.stop(this.ctx.currentTime + i * 0.06 + 0.25);
+      });
     } catch(e) {}
   }
 }
@@ -1212,7 +1394,7 @@ function line(ctx, rng, x0, y0, x1, y1, o = {}) {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   4. 社交病毒式情绪知识库 (Viral Moods, Personas, Yi & Ji)
+   4. 情绪知识库与 SVG 矢量图标映射 (100% 纯 SVG 无 Emoji)
    ───────────────────────────────────────────────────────────── */
 const SVG_ICONS = {
   happy: `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`,
@@ -1235,8 +1417,8 @@ const WEATHER_ITEMS = [
 const MOOD_DATABASE = {
   happy: {
     tag: '快乐起飞',
-    persona: '✨ 情绪物种：全天候小太阳',
-    energyTitle: '⚡ 快乐充能状态',
+    persona: '情绪物种：全天候小太阳',
+    energyTitle: '快乐充能状态',
     energyVal: 95,
     doList: ['喝全糖奶茶 / 奖励自己', '大步踩落叶 / 听欢快歌', '对镜子大笑 / 散发魅力'],
     dontList: ['扫兴冷场 / 犹豫不决', '自我否定 / 委屈自己', '节食内疚 / 压抑欢喜'],
@@ -1249,8 +1431,8 @@ const MOOD_DATABASE = {
   },
   chill: {
     tag: '佛系摸鱼',
-    persona: '🍵 情绪物种：优雅端水摸鱼大师',
-    energyTitle: '🍃 悠闲摸鱼指数',
+    persona: '情绪物种：优雅端水摸鱼大师',
+    energyTitle: '悠闲摸鱼指数',
     energyVal: 80,
     doList: ['准点下班 / 窗边发呆', '泡大麦茶 / 慢吞吞散步', '把任务推到明天 / 保持微笑'],
     dontList: ['秒回工作 / 瞎操心', '过度内耗 / 逞强硬扛', '卷生卷死 / 焦虑失眠'],
@@ -1263,8 +1445,8 @@ const MOOD_DATABASE = {
   },
   tired: {
     tag: '电量告急',
-    persona: '🪫 情绪物种：低功耗待机小树獭',
-    energyTitle: '🔋 剩余续航电量',
+    persona: '情绪物种：低功耗待机小树獭',
+    energyTitle: '剩余续航电量',
     energyVal: 15,
     doList: ['拒绝无效社交 / 提前钻被窝', '洗个热气腾腾热水澡', '静音手机 / 开启勿扰'],
     dontList: ['深夜网抑云 / 熬夜刷手机', '强行营业 / 假装热情', '勉强自己 / 揽责任'],
@@ -1277,8 +1459,8 @@ const MOOD_DATABASE = {
   },
   rage: {
     tag: '炸毛暴走',
-    persona: '🔥 情绪物种：一点就着移动小火球',
-    energyTitle: '⚡ 怒气沸腾数值',
+    persona: '情绪物种：一点就着移动小火球',
+    energyTitle: '怒气沸腾数值',
     energyVal: 89,
     doList: ['狠狠嚼无糖薄荷糖 / 听摇滚', '暴风吸入冰淇淋 / 宣泄情绪', '把烦恼画成猪头撕碎'],
     dontList: ['跟杠精讲道理 / 生闷气', '勉强忍气吞声 / 委屈自己', '冲动买单 / 摔手机'],
@@ -1291,8 +1473,8 @@ const MOOD_DATABASE = {
   },
   curious: {
     tag: '脑洞大开',
-    persona: '🛸 情绪物种：宇宙漫游级天马行空客',
-    energyTitle: '💡 灵感活跃程度',
+    persona: '情绪物种：宇宙漫游级天马行空客',
+    energyTitle: '灵感活跃程度',
     energyVal: 92,
     doList: ['记下荒谬新想法 / 探索新路线', '观察云朵像不像小狗', '换个奇妙的角度看世界'],
     dontList: ['墨守成规 / 扼杀脑洞', '自我怀疑 / 盲从他人', '死板教条 / 无趣度日'],
@@ -1305,8 +1487,8 @@ const MOOD_DATABASE = {
   },
   cozy: {
     tag: '想睡大觉',
-    persona: '🌙 情绪物种：暖烘烘被窝守护神',
-    energyTitle: '💤 睡眠充能意愿',
+    persona: '情绪物种：暖烘烘被窝守护神',
+    energyTitle: '睡眠充能意愿',
     energyVal: 35,
     doList: ['点暖黄床头灯 / 换软睡衣', '抱紧毛绒玩偶 / 放空思绪', '听白噪音 / 酝酿好梦'],
     dontList: ['胡思乱想 / 复盘尴尬事', '睡前喝浓茶 / 熬夜追剧', '开大灯 / 躺床上办公'],
@@ -1320,8 +1502,15 @@ const MOOD_DATABASE = {
 };
 
 /* ─────────────────────────────────────────────────────────────
-   5. 小人手绘渲染引擎 (Rich Props, Poses, Clothes, Accessories)
+   5. 小人手绘渲染引擎 (包含彩蛋形态：猫咪、暴富、被戳晕、锦鲤)
    ───────────────────────────────────────────────────────────── */
+let eggState = {
+  isDizzy: false,   // 连续戳5次晕厥
+  isKoi: false,     // 连续戳10次锦鲤爆发
+  isHeart: false,   // 长按心动爱心眼
+  specialKeyword: null // 猫咪 / 暴富 / 咖啡
+};
+
 function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
   const ctx = canvas.getContext('2d');
   const W = canvas.width;
@@ -1346,7 +1535,6 @@ function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
   const bodyW = 76 + jit(rng, 6);
   const bodyH = 88 + jit(rng, 6);
   const bodyTop = cy + 14;
-  const outfitStyle = Math.floor(rng() * 3);
 
   const bodyPts = [
     [cx - bodyW * 0.72, bodyTop],
@@ -1356,28 +1544,18 @@ function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
   ];
 
   polyFill(ctx, rng, bodyPts, colors.paper);
-  polyFill(ctx, rng, bodyPts, colors.accent, 0.22);
+  polyFill(ctx, rng, bodyPts, colors.accent, eggState.isKoi ? 0.45 : 0.22);
   strokePts(ctx, rng, bodyPts, { w: 3.6, close: true, color: colors.ink });
 
-  // 服装细节
-  if (outfitStyle === 0) {
+  // 身体图案
+  if (eggState.isKoi) {
+    for (let y = bodyTop + 20; y < bodyTop + bodyH - 10; y += 16) {
+      strokePts(ctx, rng, ellipsePts(cx, y, 16, 8, 6, 0, Math.PI), { w: 2.5, color: '#B87C14' });
+    }
+  } else {
     for (let y = bodyTop + 20; y < bodyTop + bodyH - 8; y += 18) {
       line(ctx, rng, cx - bodyW * 0.75, y, cx + bodyW * 0.75, y, { w: 2.2, color: colors.ink, alpha: 0.5 });
     }
-  } else if (outfitStyle === 1) {
-    line(ctx, rng, cx - 18, bodyTop, cx - 18, bodyTop + 35, { w: 3, color: colors.ink });
-    line(ctx, rng, cx + 18, bodyTop, cx + 18, bodyTop + 35, { w: 3, color: colors.ink });
-    const pocket = [
-      [cx - 14, bodyTop + 34],
-      [cx + 14, bodyTop + 34],
-      [cx + 14, bodyTop + 54],
-      [cx - 14, bodyTop + 54]
-    ];
-    polyFill(ctx, rng, pocket, colors.accent, 0.4);
-    strokePts(ctx, rng, pocket, { w: 2.2, close: true, color: colors.ink });
-  } else {
-    strokePts(ctx, rng, [[cx - 8, bodyTop + 6], [cx + 8, bodyTop + 6], [cx, bodyTop + 14]], { w: 2.2, close: true, color: colors.ink });
-    strokePts(ctx, rng, [[cx - 6, bodyTop + 14], [cx + 6, bodyTop + 14], [cx, bodyTop + 36]], { w: 2.2, close: true, color: colors.ink });
   }
 
   // 3. 双腿与鞋子
@@ -1388,10 +1566,22 @@ function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
   line(ctx, rng, cx + 26, legY0, cx + 30, legY1, { w: 4, color: colors.ink });
   blobFill(ctx, rng, cx + 40, legY1 + 4, 12, 7, colors.ink);
 
-  // 4. 手臂与道具姿态
+  // 4. 手臂与手持道具
   const shoulderY = bodyTop + 12;
 
-  if (moodKey === 'happy') {
+  if (eggState.specialKeyword === 'cat') {
+    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - 18, shoulderY + 34, { w: 3.8, color: colors.ink });
+    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + 18, shoulderY + 34, { w: 3.8, color: colors.ink });
+    blobFill(ctx, rng, cx, shoulderY + 28, 16, 14, colors.accent, 0.7);
+    strokePts(ctx, rng, ellipsePts(cx, shoulderY + 28, 16, 14, 12), { w: 2.5, close: true, color: colors.ink });
+    polyFill(ctx, rng, [[cx - 12, shoulderY + 16], [cx - 6, shoulderY + 16], [cx - 10, shoulderY + 6]], colors.ink);
+    polyFill(ctx, rng, [[cx + 12, shoulderY + 16], [cx + 6, shoulderY + 16], [cx + 10, shoulderY + 6]], colors.ink);
+  } else if (eggState.specialKeyword === 'money' || eggState.isKoi) {
+    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 1.1, shoulderY - 30, { w: 3.6, color: colors.ink });
+    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 1.1, shoulderY - 30, { w: 3.6, color: colors.ink });
+    drawHandDrawnStar(ctx, rng, cx + bodyW * 1.15, shoulderY - 45, 16, colors);
+    line(ctx, rng, cx + bodyW * 1.1, shoulderY - 25, cx + bodyW * 1.15, shoulderY - 45, { w: 3, color: '#B87C14' });
+  } else if (moodKey === 'happy') {
     line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 1.15, shoulderY - 38, { w: 3.6, color: colors.ink });
     line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 1.15, shoulderY - 38, { w: 3.6, color: colors.ink });
     const bx = cx + bodyW * 1.25, by = shoulderY - 70;
@@ -1408,18 +1598,6 @@ function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
     strokePts(ctx, rng, cup, { w: 2.2, close: true, color: colors.ink });
     line(ctx, rng, mx - 2, my - 9, mx - 2, my - 16, { w: 1.8, color: colors.accent });
     line(ctx, rng, mx + 2, my - 9, mx + 2, my - 16, { w: 1.8, color: colors.accent });
-  } else if (moodKey === 'rage') {
-    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 1.05, shoulderY + 20, { w: 3.8, color: colors.ink });
-    line(ctx, rng, cx - bodyW * 1.05, shoulderY + 20, cx - bodyW * 0.65, shoulderY + 44, { w: 3.8, color: colors.ink });
-    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 1.05, shoulderY + 20, { w: 3.8, color: colors.ink });
-    line(ctx, rng, cx + bodyW * 1.05, shoulderY + 20, cx + bodyW * 0.65, shoulderY + 44, { w: 3.8, color: colors.ink });
-  } else if (moodKey === 'curious') {
-    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 0.85, shoulderY + 28, { w: 3.6, color: colors.ink });
-    line(ctx, rng, cx - bodyW * 0.85, shoulderY + 28, cx - 12, shoulderY - 8, { w: 3.6, color: colors.ink });
-    const lx = cx + bodyW * 0.95, ly = shoulderY + 10;
-    line(ctx, rng, cx + bodyW * 0.68, shoulderY, lx, ly, { w: 3.6, color: colors.ink });
-    strokePts(ctx, rng, ellipsePts(lx + 8, ly - 8, 11, 11, 12), { w: 2.5, close: true, color: colors.accent });
-    line(ctx, rng, lx + 16, ly, lx + 24, ly + 8, { w: 3, color: colors.ink });
   } else {
     line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 0.9, shoulderY + 38, { w: 3.6, color: colors.ink });
     line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 0.9, shoulderY + 38, { w: 3.6, color: colors.ink });
@@ -1435,49 +1613,48 @@ function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
   blobFill(ctx, rng, cx - headR * 0.58, headCY + 15, 11, 7, '#f59e9e', 0.55);
   blobFill(ctx, rng, cx + headR * 0.58, headCY + 15, 11, 7, '#f59e9e', 0.55);
 
-  // 6. 发型与头饰 (丰富 6 款)
-  const hairStyle = Math.floor(rng() * 6);
-  if (hairStyle === 0) {
-    line(ctx, rng, cx, headCY - headR, cx - 12, headCY - headR - 28, { w: 3.5, color: colors.ink });
-    line(ctx, rng, cx + 4, headCY - headR, cx + 16, headCY - headR - 24, { w: 3.2, color: colors.ink });
-    blobFill(ctx, rng, cx - 14, headCY - headR - 28, 5, 4, colors.accent);
-  } else if (hairStyle === 1) {
+  // 6. 发型与头饰
+  if (eggState.specialKeyword === 'cat') {
+    const earL = [[cx - headR * 0.7, headCY - headR * 0.6], [cx - headR * 0.3, headCY - headR * 0.9], [cx - headR * 0.8, headCY - headR * 1.15]];
+    const earR = [[cx + headR * 0.7, headCY - headR * 0.6], [cx + headR * 0.3, headCY - headR * 0.9], [cx + headR * 0.8, headCY - headR * 1.15]];
+    polyFill(ctx, rng, earL, colors.accent, 0.6);
+    strokePts(ctx, rng, earL, { w: 3, close: true, color: colors.ink });
+    polyFill(ctx, rng, earR, colors.accent, 0.6);
+    strokePts(ctx, rng, earR, { w: 3, close: true, color: colors.ink });
+  } else if (eggState.isKoi) {
+    const crown = [
+      [cx - 24, headCY - headR + 4],
+      [cx + 24, headCY - headR + 4],
+      [cx + 26, headCY - headR - 22],
+      [cx + 12, headCY - headR - 10],
+      [cx, headCY - headR - 26],
+      [cx - 12, headCY - headR - 10],
+      [cx - 26, headCY - headR - 22]
+    ];
+    polyFill(ctx, rng, crown, '#FFD700');
+    strokePts(ctx, rng, crown, { w: 3, close: true, color: '#B87C14' });
+  } else {
     const hairPts = ellipsePts(cx, headCY, headR * 1.04, headR * 1.04, 14, Math.PI * 0.88, Math.PI * 2.12);
     strokePts(ctx, rng, hairPts, { w: 5, color: colors.ink });
-  } else if (hairStyle === 2) {
-    for (let angle = Math.PI * 0.78; angle <= Math.PI * 2.22; angle += 0.28) {
-      const hx = cx + Math.cos(angle) * (headR + 8);
-      const hy = headCY + Math.sin(angle) * (headR + 8);
-      blobFill(ctx, rng, hx, hy, 13, 13, colors.ink, 0.88);
-    }
-  } else if (hairStyle === 3) {
-    const hatPts = [
-      [cx - headR * 0.9, headCY - headR * 0.45],
-      [cx + headR * 0.9, headCY - headR * 0.75],
-      [cx + headR * 0.45, headCY - headR * 1.25],
-      [cx - headR * 0.65, headCY - headR * 1.05]
-    ];
-    polyFill(ctx, rng, hatPts, colors.accent);
-    strokePts(ctx, rng, hatPts, { w: 3.2, close: true, color: colors.ink });
-    blobFill(ctx, rng, cx, headCY - headR * 1.2, 7, 7, colors.paper);
-    strokePts(ctx, rng, ellipsePts(cx, headCY - headR * 1.2, 7, 7), { w: 2, close: true, color: colors.ink });
-  } else if (hairStyle === 4) {
-    blobFill(ctx, rng, cx - headR * 0.8, headCY - headR * 0.7, 14, 14, colors.ink, 0.88);
-    blobFill(ctx, rng, cx + headR * 0.8, headCY - headR * 0.7, 14, 14, colors.ink, 0.88);
-  } else {
-    const headBand = ellipsePts(cx, headCY, headR * 1.15, headR * 1.15, 12, Math.PI * 1.1, Math.PI * 1.9);
-    strokePts(ctx, rng, headBand, { w: 4, color: colors.ink });
-    blobFill(ctx, rng, cx - headR * 1.05, headCY + 2, 12, 18, colors.accent);
-    strokePts(ctx, rng, ellipsePts(cx - headR * 1.05, headCY + 2, 12, 18, 8), { w: 2.5, close: true, color: colors.ink });
-    blobFill(ctx, rng, cx + headR * 1.05, headCY + 2, 12, 18, colors.accent);
-    strokePts(ctx, rng, ellipsePts(cx + headR * 1.05, headCY + 2, 12, 18, 8), { w: 2.5, close: true, color: colors.ink });
+    line(ctx, rng, cx, headCY - headR, cx - 12, headCY - headR - 26, { w: 3.5, color: colors.ink });
   }
 
   // 7. 眼睛与神态
   const eyeSpan = 21 + jit(rng, 3);
   const eyeY = headCY + 2;
 
-  if (moodKey === 'happy') {
+  if (eggState.isDizzy) {
+    drawSpiralEye(ctx, rng, cx - eyeSpan, eyeY, 10, colors.ink);
+    drawSpiralEye(ctx, rng, cx + eyeSpan, eyeY, 10, colors.ink);
+    strokePts(ctx, rng, ellipsePts(cx, eyeY + 16, 10, 8, 8, 0, Math.PI), { w: 2.8, color: colors.ink });
+    blobFill(ctx, rng, cx, eyeY + 22, 6, 9, '#ff6b6b');
+    drawHandDrawnStar(ctx, rng, cx - 20, headCY - headR - 18, 9, colors);
+    drawHandDrawnStar(ctx, rng, cx + 20, headCY - headR - 24, 11, colors);
+  } else if (eggState.isHeart) {
+    drawHeart(ctx, rng, cx - eyeSpan, eyeY, 10, '#ff4757');
+    drawHeart(ctx, rng, cx + eyeSpan, eyeY, 10, '#ff4757');
+    strokePts(ctx, rng, ellipsePts(cx, eyeY + 15, 12, 8, 6, 0.2, Math.PI - 0.2), { w: 3.2, color: colors.ink });
+  } else if (moodKey === 'happy') {
     strokePts(ctx, rng, ellipsePts(cx - eyeSpan, eyeY, 10, 8, 6, Math.PI + 0.3, Math.PI * 2 - 0.3), { w: 3.5, color: colors.ink });
     strokePts(ctx, rng, ellipsePts(cx + eyeSpan, eyeY, 10, 8, 6, Math.PI + 0.3, Math.PI * 2 - 0.3), { w: 3.5, color: colors.ink });
     strokePts(ctx, rng, ellipsePts(cx, eyeY + 15, 13, 9, 8, 0.2, Math.PI - 0.2), { w: 3.2, close: true, color: colors.ink });
@@ -1491,10 +1668,6 @@ function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
     line(ctx, rng, cx + eyeSpan + 9, eyeY - 6, cx + eyeSpan - 7, eyeY + 2, { w: 3.8, color: colors.ink });
     const zx = cx - 11, zy = eyeY + 20;
     strokePts(ctx, rng, [[zx, zy], [zx+5, zy-4], [zx+10, zy+4], [zx+15, zy-4], [zx+20, zy]], { w: 2.8, color: colors.ink });
-  } else if (moodKey === 'cozy') {
-    strokePts(ctx, rng, ellipsePts(cx - eyeSpan, eyeY + 2, 9, 6, 6, 0.3, Math.PI - 0.3), { w: 3.2, color: colors.ink });
-    strokePts(ctx, rng, ellipsePts(cx + eyeSpan, eyeY + 2, 9, 6, 6, 0.3, Math.PI - 0.3), { w: 3.2, color: colors.ink });
-    strokePts(ctx, rng, ellipsePts(cx, eyeY + 15, 7, 4, 6, 0.3, Math.PI - 0.3), { w: 2.6, color: colors.ink });
   } else {
     blobFill(ctx, rng, cx - eyeSpan, eyeY, 6, 6, colors.ink);
     blobFill(ctx, rng, cx - eyeSpan - 2, eyeY - 2, 2, 2, '#fff');
@@ -1503,20 +1676,44 @@ function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
     strokePts(ctx, rng, ellipsePts(cx, eyeY + 15, 9, 6, 6, 0.3, Math.PI - 0.3), { w: 2.8, color: colors.ink });
   }
 
-  // 8. 情绪漂浮特效元素
-  if (moodKey === 'happy') {
+  // 8. 情绪漂浮特效
+  if (eggState.isKoi) {
+    drawHandDrawnStar(ctx, rng, cx + headR * 0.9, headCY - headR * 0.6, 14, colors);
+    drawHandDrawnStar(ctx, rng, cx - headR * 0.9, headCY - headR * 0.4, 12, colors);
+  } else if (moodKey === 'happy') {
     drawHandDrawnStar(ctx, rng, cx + headR * 0.9, headCY - headR * 0.5, 12, colors);
-    drawHandDrawnStar(ctx, rng, cx - headR * 0.85, headCY - headR * 0.3, 8, colors);
-  } else if (moodKey === 'tired' || moodKey === 'cozy') {
+  } else if (moodKey === 'tired') {
     drawHandDrawnZzz(ctx, rng, cx + headR * 0.75, headCY - headR * 0.5, colors);
   } else if (moodKey === 'rage') {
     drawHandDrawnRage(ctx, rng, cx + headR * 0.75, headCY - headR * 0.5, colors);
-  } else if (moodKey === 'curious') {
-    drawHandDrawnSpark(ctx, rng, cx + headR * 0.8, headCY - headR * 0.5, colors);
   }
 }
 
-/* 手绘特效零件 */
+/* 彩蛋零件 */
+function drawSpiralEye(ctx, rng, x, y, r, color) {
+  const pts = [];
+  const turns = 2.2;
+  const segs = 20;
+  for (let i = 0; i <= segs; i++) {
+    const t = i / segs;
+    const a = t * Math.PI * 2 * turns;
+    const rr = r * t;
+    pts.push([x + Math.cos(a) * rr, y + Math.sin(a) * rr]);
+  }
+  strokePts(ctx, rng, pts, { w: 2.5, color: color });
+}
+
+function drawHeart(ctx, rng, x, y, size, color) {
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(x, y + size * 0.3);
+  ctx.bezierCurveTo(x, y - size * 0.5, x - size, y - size * 0.5, x - size, y + size * 0.3);
+  ctx.bezierCurveTo(x - size, y + size * 0.8, x, y + size * 1.3, x, y + size * 1.5);
+  ctx.bezierCurveTo(x, y + size * 1.3, x + size, y + size * 0.8, x + size, y + size * 0.3);
+  ctx.bezierCurveTo(x + size, y - size * 0.5, x, y - size * 0.5, x, y + size * 0.3);
+  ctx.fill();
+}
+
 function drawHandDrawnStar(ctx, rng, x, y, r, colors) {
   const pts = [];
   for (let i = 0; i < 8; i++) {
@@ -1539,13 +1736,8 @@ function drawHandDrawnRage(ctx, rng, x, y, colors) {
   line(ctx, rng, x, y - 7, x, y + 7, { w: 3, color: '#c43a3a' });
 }
 
-function drawHandDrawnSpark(ctx, rng, x, y, colors) {
-  line(ctx, rng, x - 9, y, x + 9, y, { w: 2.4, color: colors.accent });
-  line(ctx, rng, x, y - 9, x, y + 9, { w: 2.4, color: colors.accent });
-}
-
 /* ─────────────────────────────────────────────────────────────
-   6. 手绘波浪分割线 (Wave Divider)
+   6. 手绘波浪分割线
    ───────────────────────────────────────────────────────────── */
 function renderWaveDivider() {
   const waveCanvas = document.getElementById('waveCanvas');
@@ -1569,7 +1761,7 @@ function renderWaveDivider() {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   7. 动态二维码生成器 (QR Code Generator)
+   7. 动态二维码生成器
    ───────────────────────────────────────────────────────────── */
 let qrcodeInstance = null;
 
@@ -1589,13 +1781,13 @@ function updateQRCode(shareURL) {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   8. 界面状态机与事件响应 (Viral Event Hub)
+   8. 界面状态机与事件响应 (Viral & Easter Egg Engine)
    ───────────────────────────────────────────────────────────── */
 const avatarCanvas = document.getElementById('avatarCanvas');
 const userInput = document.getElementById('userInput');
 const dateDisplay = document.getElementById('date-display');
 const weatherDisplay = document.getElementById('weather-display');
-const personaBadge = document.getElementById('persona-badge');
+const personaText = document.getElementById('persona-text');
 const tagCapsule = document.getElementById('tag-capsule');
 const tagIconWrap = document.getElementById('tag-icon-wrap');
 const tagText = document.getElementById('tag-text');
@@ -1608,13 +1800,20 @@ const energyBar = document.getElementById('energy-bar');
 const authorSig = document.getElementById('author-sig');
 const moodCard = document.getElementById('mood-card');
 const avatarStage = document.getElementById('avatar-stage');
+const pokeTipText = document.getElementById('poke-tip-text');
 const moodTabs = document.querySelectorAll('.mood-tab');
 const optionBtns = document.querySelectorAll('.option-btn');
 const themeCircles = document.querySelectorAll('.theme-circle');
 const btnRandom = document.getElementById('btn-random');
 const btnExport = document.getElementById('btn-export');
-const btnCopyCopywriting = document.getElementById('btn-copy-copywriting');
-const btnShareLink = document.getElementById('btn-share-link');
+const btnShareWechat = document.getElementById('btn-share-wechat');
+const btnShareXHS = document.getElementById('btn-share-xhs');
+const wechatMask = document.getElementById('wechat-mask');
+const xhsMask = document.getElementById('xhs-mask');
+const btnCloseWechatMask = document.getElementById('btn-close-wechat-mask');
+const btnCloseXhsMask = document.getElementById('btn-close-xhs-mask');
+const btnXhsDirectShare = document.getElementById('btn-xhs-direct-share');
+const xhsPreviewBox = document.getElementById('xhs-preview-box');
 const friendBanner = document.getElementById('friend-banner');
 const friendBannerText = document.getElementById('friend-banner-text');
 const btnMakeMyOwn = document.getElementById('btn-make-my-own');
@@ -1626,11 +1825,9 @@ let currentMoodKey = 'happy';
 let currentSeed = 'seed-' + Date.now();
 let currentTheme = 'pine';
 
-// 初始化随机访客数字增加真实感
-const baseVisitor = 2140 + Math.floor(Math.random() * 450);
+const baseVisitor = 2380 + Math.floor(Math.random() * 320);
 visitorCountEl.textContent = baseVisitor.toLocaleString();
 
-// 初始化日期
 const now = new Date();
 dateDisplay.textContent = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
 
@@ -1640,7 +1837,6 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove('show'), 2400);
 }
 
-// 构造当前卡片的专属分享链接
 function buildShareURL() {
   const url = new URL(window.location.href.split('?')[0]);
   const name = userInput.value.trim();
@@ -1664,102 +1860,264 @@ function updateAppCard(seed, moodKey = null) {
 
   const moodData = MOOD_DATABASE[currentMoodKey] || MOOD_DATABASE.happy;
   
-  // 1. 更新人格与标签
-  personaBadge.textContent = moodData.persona;
-  tagIconWrap.innerHTML = SVG_ICONS[currentMoodKey] || SVG_ICONS.happy;
-  tagText.textContent = moodData.tag;
+  // 检查特殊彩蛋关键词
+  const rawInput = userInput.value.trim().toLowerCase();
+  if (rawInput.includes('猫') || rawInput.includes('cat') || rawInput.includes('喵')) {
+    eggState.specialKeyword = 'cat';
+    personaText.textContent = '隐藏款：尊贵的高冷猫主子';
+    tagText.textContent = '喵星人附体';
+    fortuneDo.textContent = '大口吃肉 / 伸懒腰发呆';
+    fortuneDont.textContent = '被无聊人类打扰 / 剪指甲';
+  } else if (rawInput.includes('暴富') || rawInput.includes('发财') || rawInput.includes('money')) {
+    eggState.specialKeyword = 'money';
+    personaText.textContent = '隐藏款：移动吸金暴富锦鲤';
+    tagText.textContent = '财运滚滚来';
+    fortuneDo.textContent = '买刮刮乐 / 准点数钱';
+    fortuneDont.textContent = '冲动借钱 / 精神内耗';
+  } else {
+    eggState.specialKeyword = null;
+    personaText.textContent = moodData.persona;
+    tagText.textContent = moodData.tag;
+    fortuneDo.textContent = pick(rng, moodData.doList);
+    fortuneDont.textContent = pick(rng, moodData.dontList);
+  }
 
-  // 2. 更新金句
+  tagIconWrap.innerHTML = SVG_ICONS[currentMoodKey] || SVG_ICONS.happy;
   quoteText.textContent = pick(rng, moodData.quotes);
 
-  // 3. 更新今日宜忌
-  fortuneDo.textContent = pick(rng, moodData.doList);
-  fortuneDont.textContent = pick(rng, moodData.dontList);
-
-  // 4. 更新能量仪表
   energyTitle.textContent = moodData.energyTitle;
   const energyPercent = Math.min(100, Math.max(12, moodData.energyVal + Math.round(jit(rng, 5))));
   energyValue.textContent = `${energyPercent}%`;
   energyBar.style.width = `${energyPercent}%`;
 
-  // 5. 更新天气
   const weatherObj = pick(rng, WEATHER_ITEMS);
   weatherDisplay.innerHTML = `${weatherObj.icon} <span>${weatherObj.text}</span>`;
 
-  // 6. 更新署名
   const authorName = userInput.value.trim();
   authorSig.textContent = authorName ? `— @${authorName}` : '— @匿名漫游者';
 
-  // 7. 高亮当前情绪按钮
   moodTabs.forEach(tab => {
     tab.classList.toggle('active', tab.dataset.mood === currentMoodKey);
   });
 
-  // 8. 重新绘制小人 & 波浪
   renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey);
   renderWaveDivider();
-
-  // 9. 更新卡片溯源二维码
   updateQRCode(buildShareURL());
 }
 
-/* 交互：戳一戳跳跃动画 */
-let isJumping = false;
-avatarStage.addEventListener('click', () => {
-  if (isJumping) return;
-  isJumping = true;
-  sound.playPop();
+/* ─────────────────────────────────────────────────────────────
+   9. 彩蛋交互系统 (Combo Pokes & Long Press Hearts)
+   ───────────────────────────────────────────────────────────── */
+let pokeCount = 0;
+let lastPokeTime = 0;
+let longPressTimer = null;
 
+avatarStage.addEventListener('click', () => {
+  const nowT = Date.now();
+  if (nowT - lastPokeTime < 1200) {
+    pokeCount++;
+  } else {
+    pokeCount = 1;
+  }
+  lastPokeTime = nowT;
+
+  if (pokeCount >= 10) {
+    sound.playMagic();
+    eggState.isKoi = true;
+    eggState.isDizzy = false;
+    document.documentElement.setAttribute('data-egg', 'koi');
+    personaText.textContent = '终极大彩蛋：宇宙无敌幸运锦鲤';
+    tagText.textContent = '锦鲤附体 暴富幸运';
+    quoteText.textContent = '“恭喜解锁隐藏锦鲤款！今日所有愿望即刻生效！”';
+    pokeTipText.textContent = '已解锁超稀有金色锦鲤！';
+
+    confetti({
+      particleCount: 80,
+      spread: 90,
+      origin: { y: 0.6 },
+      colors: ['#FFD700', '#FFA500', '#FF6347', '#FFE4B5']
+    });
+
+    renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey);
+    showToast('恭喜触发 10 连击隐藏锦鲤彩蛋！');
+    return;
+  }
+
+  if (pokeCount >= 5) {
+    sound.playPop();
+    eggState.isDizzy = true;
+    pokeTipText.textContent = '别戳啦！脑浆都晃匀啦～';
+    moodCard.style.transform = 'rotate(-3deg) scale(0.96)';
+    setTimeout(() => { moodCard.style.transform = 'none'; }, 200);
+    renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey);
+    showToast('小人被你戳晕啦！再戳5次试试？');
+    return;
+  }
+
+  sound.playPop();
   let startT = null;
   const dur = 340;
-
   function jump(t) {
     if (!startT) startT = t;
     const p = (t - startT) / dur;
     if (p < 1) {
-      const offset = -Math.sin(p * Math.PI) * 30;
+      const offset = -Math.sin(p * Math.PI) * 28;
       renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey, offset);
       requestAnimationFrame(jump);
     } else {
       renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey, 0);
-      isJumping = false;
     }
   }
   requestAnimationFrame(jump);
 });
 
-/* 交互：输入监听 */
+avatarStage.addEventListener('touchstart', () => {
+  longPressTimer = setTimeout(() => {
+    sound.playMagic();
+    eggState.isHeart = true;
+    pokeTipText.textContent = '摸摸头，今天被爱着呢～';
+    renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey);
+    showToast('触发摸摸头心动彩蛋！');
+    confetti({ particleCount: 30, spread: 50, origin: { y: 0.65 }, colors: ['#ff4757', '#ff6b81'] });
+  }, 600);
+}, { passive: true });
+
+avatarStage.addEventListener('touchend', () => {
+  clearTimeout(longPressTimer);
+});
+
+avatarStage.addEventListener('mousedown', () => {
+  longPressTimer = setTimeout(() => {
+    sound.playMagic();
+    eggState.isHeart = true;
+    pokeTipText.textContent = '摸摸头，今天被爱着呢～';
+    renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey);
+    showToast('触发摸摸头心动彩蛋！');
+    confetti({ particleCount: 30, spread: 50, origin: { y: 0.65 }, colors: ['#ff4757', '#ff6b81'] });
+  }, 600);
+});
+
+avatarStage.addEventListener('mouseup', () => {
+  clearTimeout(longPressTimer);
+});
+
+/* ─────────────────────────────────────────────────────────────
+   10. 朋友圈 / 小红书 一键分享系统
+   ───────────────────────────────────────────────────────────── */
+const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
+
+btnShareWechat.addEventListener('click', () => {
+  sound.playPop();
+  const shareURL = buildShareURL();
+  const title = `今日精神状态诊断书 · @${userInput.value.trim() || '我'} 的手绘心情小人`;
+
+  if (isWeChat) {
+    wechatMask.classList.add('active');
+  } else if (navigator.share && navigator.canShare) {
+    html2canvas(moodCard, { scale: 2.5, backgroundColor: null }).then(canvas => {
+      canvas.toBlob(blob => {
+        const file = new File([blob], 'my-mood-card.png', { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
+          navigator.share({
+            files: [file],
+            title: title,
+            text: '测测你的今日手绘小人与精神状态！',
+            url: shareURL
+          }).catch(() => {});
+        } else {
+          wechatMask.classList.add('active');
+        }
+      });
+    });
+  } else {
+    wechatMask.classList.add('active');
+  }
+});
+
+btnShareXHS.addEventListener('click', () => {
+  sound.playPop();
+  xhsMask.classList.add('active');
+  xhsPreviewBox.innerHTML = '<span style="font-size:12px;color:#888;">正在生成小红书专属 3:4 卡片...</span>';
+
+  html2canvas(moodCard, { scale: 3, backgroundColor: null }).then(canvas => {
+    const img = new Image();
+    img.src = canvas.toDataURL('image/png');
+    img.style.maxWidth = '100%';
+    img.style.maxHeight = '180px';
+    img.style.borderRadius = '6px';
+    xhsPreviewBox.innerHTML = '';
+    xhsPreviewBox.appendChild(img);
+  });
+});
+
+btnXhsDirectShare.addEventListener('click', () => {
+  sound.playMagic();
+  const moodData = MOOD_DATABASE[currentMoodKey] || MOOD_DATABASE.happy;
+  const authorName = userInput.value.trim() || '我';
+  const shareURL = buildShareURL();
+
+  const xhsText = 
+`今日精神状态鉴定完毕！
+[情绪物种] ${moodData.persona.replace(/.*：/, '')}
+[状态标签] ${moodData.tag}
+[今日心声] “${quoteText.textContent.replace(/[“”]/g, '')}”
+[今日宜] ${fortuneDo.textContent}
+[今日忌] ${fortuneDont.textContent}
+
+扫卡片右下角二维码测测你的今日小人: ${shareURL}
+#今日心情 #手绘小人 #情绪手账 #治愈系 #精神状态图鉴 #我的日常`;
+
+  navigator.clipboard.writeText(xhsText).then(() => {
+    showToast('小红书爆款文案已复制！正在下载卡片...');
+  });
+
+  html2canvas(moodCard, { scale: 3, backgroundColor: null }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = `xhs-mood-card-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    setTimeout(() => { xhsMask.classList.remove('active'); }, 1200);
+  });
+});
+
+btnCloseWechatMask.addEventListener('click', () => wechatMask.classList.remove('active'));
+btnCloseXhsMask.addEventListener('click', () => xhsMask.classList.remove('active'));
+
+/* ─────────────────────────────────────────────────────────────
+   11. 其他常规交互 (盲盒抽卡 / 底纹 / 色调 / 输入)
+   ───────────────────────────────────────────────────────────── */
 userInput.addEventListener('input', () => {
   const val = userInput.value.trim();
   updateAppCard(val ? `in-${val}` : 'default-seed', currentMoodKey);
 });
 
-/* 交互：情绪切换 */
 moodTabs.forEach(tab => {
   tab.addEventListener('click', () => {
     sound.playWoosh();
+    eggState.isDizzy = false;
+    eggState.isHeart = false;
+    pokeTipText.textContent = '戳戳我有彩蛋';
     const mood = tab.dataset.mood;
     const base = userInput.value.trim() || 'mood';
     updateAppCard(`${base}-${mood}-${Math.random()}`, mood);
   });
 });
 
-/* 交互：底纹切换 */
 optionBtns.forEach(btn => {
   btn.addEventListener('click', () => {
     sound.playPop();
     optionBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
     const pattern = btn.dataset.pattern;
     moodCard.className = `mood-card pattern-${pattern}`;
   });
 });
 
-/* 交互：色彩主题切换 */
 themeCircles.forEach(circle => {
   circle.addEventListener('click', () => {
     sound.playPop();
+    document.documentElement.removeAttribute('data-egg');
+    eggState.isKoi = false;
     themeCircles.forEach(c => c.classList.remove('active'));
     circle.classList.add('active');
 
@@ -1775,116 +2133,63 @@ themeCircles.forEach(circle => {
   });
 });
 
-/* 交互：🎲 抽盲盒 (触发彩带礼花爆炸 + 卡片弹跳动效) */
 btnRandom.addEventListener('click', () => {
   sound.playWoosh();
+  eggState.isDizzy = false;
+  eggState.isKoi = false;
+  eggState.isHeart = false;
+  document.documentElement.removeAttribute('data-egg');
+  pokeTipText.textContent = '戳戳我有彩蛋';
+
   const randNum = Math.floor(Math.random() * 1e8);
   const nicknames = ['摸鱼特工', '宇宙漫游者', '快乐小土豆', '失眠小熊', '打工战士', '甜筒刺客', '代码诗人', '晚风捕手', '情绪管理大师'];
   if (Math.random() > 0.4) {
     userInput.value = pick(rngFrom(String(randNum)), nicknames);
   }
 
-  // 1. 卡片弹性动画
   moodCard.style.transform = 'scale(0.95) rotate(-1.5deg)';
   setTimeout(() => { moodCard.style.transform = 'none'; }, 200);
 
-  // 2. 触发彩色礼花爆炸 (Confetti)
   try {
     confetti({
-      particleCount: 45,
-      spread: 65,
+      particleCount: 50,
+      spread: 70,
       origin: { y: 0.65 },
       colors: ['#53A548', '#C4553B', '#F5D061', '#4A6FA5', '#E26D46']
     });
   } catch (e) {}
 
   updateAppCard('rand-' + randNum);
-  showToast('🎉 抽取到全新今日精神状态！');
+  showToast('抽取到全新今日精神状态！');
 });
 
-/* 交互：📸 导出拍立得卡片 (生成 3x 超清无锯齿大图) */
 btnExport.addEventListener('click', () => {
   sound.playPop();
   btnExport.querySelector('span').textContent = '生成中...';
 
-  html2canvas(moodCard, {
-    scale: 3,
-    backgroundColor: null,
-    useCORS: true,
-    logging: false
-  }).then(canvasOutput => {
+  html2canvas(moodCard, { scale: 3, backgroundColor: null, useCORS: true }).then(canvasOutput => {
     const link = document.createElement('a');
     link.download = `mood-card-${Date.now()}.png`;
     link.href = canvasOutput.toDataURL('image/png');
     link.click();
 
-    btnExport.querySelector('span').textContent = '📸 保存拍立得';
-    showToast('🎉 拍立得手账图片已下载！');
-  }).catch(err => {
-    btnExport.querySelector('span').textContent = '📸 保存拍立得';
+    btnExport.querySelector('span').textContent = '保存卡片图片';
+    showToast('拍立得手账图片已下载！');
+  }).catch(() => {
+    btnExport.querySelector('span').textContent = '保存卡片图片';
     showToast('保存失败，请稍后重试');
   });
 });
 
-/* 交互：📋 一键复制小红书 / 朋友圈文案 */
-btnCopyCopywriting.addEventListener('click', () => {
-  sound.playPop();
-  const authorName = userInput.value.trim() || '我';
-  const moodData = MOOD_DATABASE[currentMoodKey] || MOOD_DATABASE.happy;
-  const shareURL = buildShareURL();
-
-  const viralText = 
-`今日精神状态鉴定完毕！⚡
-🎭 情绪物种：${moodData.persona.replace(/.*：/, '')}
-🏷 状态标签：${moodData.tag}
-💬 今日心声：“${quoteText.textContent.replace(/[“”]/g, '')}”
-✅ 今日宜：${fortuneDo.textContent}
-❌ 今日忌：${fortuneDont.textContent}
-
-戳这里测测你的今日手绘小人 👉 ${shareURL}
-#今日心情 #手绘小人 #情绪手账 #治愈系 #精神状态图鉴`;
-
-  navigator.clipboard.writeText(viralText).then(() => {
-    showToast('📋 朋友圈文案已复制到剪贴板！');
-  }).catch(() => {
-    showToast('复制失败，请手动长按复制');
-  });
-});
-
-/* 交互：🔗 一键分享专属链接 (支持 Web Share API) */
-btnShareLink.addEventListener('click', () => {
-  sound.playPop();
-  const shareURL = buildShareURL();
-  const title = `MoodHand 情绪手账 · @${userInput.value.trim() || '我'} 的今日心境`;
-
-  if (navigator.share) {
-    navigator.share({
-      title: title,
-      text: `快来看我的今日手绘心情小人，测测你的精神状态！`,
-      url: shareURL
-    }).catch(() => {});
-  } else {
-    navigator.clipboard.writeText(shareURL).then(() => {
-      showToast('🔗 专属分享链接已复制！去发给好友吧');
-    }).catch(() => {
-      showToast('复制失败，请手动复制地址栏链接');
-    });
-  }
-});
-
-/* 交互：好友横幅 "我也测一个" */
 btnMakeMyOwn.addEventListener('click', () => {
   sound.playWoosh();
   friendBanner.style.display = 'none';
   userInput.value = '';
   window.history.replaceState({}, '', window.location.pathname);
   updateAppCard('rand-' + Date.now());
-  showToast('✨ 已为你开启全新心情测试！');
+  showToast('已为你开启全新心情测试！');
 });
 
-/* ─────────────────────────────────────────────────────────────
-   9. URL 参数解析 (解析好友分享链接)
-   ───────────────────────────────────────────────────────────── */
 function initFromURL() {
   const params = new URLSearchParams(window.location.search);
   const nameParam = params.get('name');
@@ -1893,10 +2198,9 @@ function initFromURL() {
   const themeParam = params.get('theme');
 
   if (nameParam || moodParam || seedParam) {
-    // 说明是通过好友链接打开的
     if (nameParam) {
       userInput.value = nameParam;
-      friendBannerText.textContent = `你收到了 @${nameParam} 分享的今日心情卡片 🎁`;
+      friendBannerText.textContent = `你收到了 @${nameParam} 分享的今日心情卡片`;
     }
     friendBanner.style.display = 'flex';
 
@@ -1909,12 +2213,10 @@ function initFromURL() {
 
     updateAppCard(seedParam || `shared-${Date.now()}`, moodParam || 'happy');
   } else {
-    // 首次直接进入
     updateAppCard('init-' + Date.now());
   }
 }
 
-// 启动应用
 initFromURL();
 </script>
 </body>
