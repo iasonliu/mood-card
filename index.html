@@ -126,7 +126,13 @@
     --card-shadow: 0 0 25px rgba(229, 169, 59, 0.65), 6px 8px 0px #3D2B12 !important;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
 
   body {
     min-height: 100vh;
@@ -229,7 +235,40 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     3. 社交一键分享微信/小红书引导蒙层 (Share Guide Modal)
+     3. 顶部工具条 (静音开关 + 历史存档抽屉入口)
+     ───────────────────────────────────────────────────────────── */
+  .top-toolbar {
+    width: 100%;\n    max-width: 440px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .tool-btn {
+    background: var(--hw-paper);
+    border: 2px solid var(--hw-ink);
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: bold;
+    color: var(--hw-ink);
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--hw-ink);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.1s;
+  }
+
+  .tool-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0;
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     4. 社交一键分享微信/小红书引导蒙层 (Share Guide Modal)
      ───────────────────────────────────────────────────────────── */
   .share-mask {
     position: fixed;
@@ -318,7 +357,7 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     4. 好友分享裂变横幅 (Viral Friend Banner)
+     5. 好友分享裂变横幅 (Viral Friend Banner)
      ───────────────────────────────────────────────────────────── */
   .friend-banner {
     width: 100%;
@@ -359,11 +398,11 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     5. 顶部品牌与氛围
+     6. 顶部品牌与氛围
      ───────────────────────────────────────────────────────────── */
   .app-header {
     text-align: center;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     max-width: 480px;
     width: 100%;
   }
@@ -381,6 +420,14 @@
     margin-bottom: 6px;
     font-weight: 700;
     letter-spacing: 0.3px;
+  }
+
+  .brand-pill svg {
+    width: 15px;
+    height: 15px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
   }
 
   .app-title {
@@ -413,7 +460,7 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     6. 核心手账卡片
+     7. 核心手账卡片
      ───────────────────────────────────────────────────────────── */
   .app-layout {
     width: 100%;
@@ -777,7 +824,7 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     7. 控制操作面板 (一键发朋友圈 / 小红书 / 抽盲盒 / 保存)
+     8. 控制操作面板 (一键发朋友圈 / 小红书 / 抽盲盒 / 保存)
      ───────────────────────────────────────────────────────────── */
   .ctrl-panel {
     width: 100%;
@@ -1004,6 +1051,87 @@
     line-height: 1.4;
   }
 
+  /* ─────────────────────────────────────────────────────────────
+     9. 历史手账归档抽屉 (My History Diary Modal)
+     ───────────────────────────────────────────────────────────── */
+  .history-drawer {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(3px);
+    z-index: 10002;
+    display: flex;
+    align-items: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .history-drawer.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .drawer-content {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    background: var(--hw-paper);
+    border-top: 3px solid var(--hw-ink);
+    border-radius: 20px 20px 0 0;
+    padding: 20px 16px 30px;
+    max-height: 75vh;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .history-drawer.active .drawer-content {
+    transform: translateY(0);
+  }
+
+  .drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px dashed var(--hw-ink-subtle);
+    padding-bottom: 10px;
+  }
+
+  .drawer-header h3 {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .drawer-list {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 4px;
+  }
+
+  .history-item {
+    background: var(--hw-paper-tint);
+    border: 1.5px solid var(--hw-ink);
+    border-radius: 10px;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--hw-ink);
+  }
+
+  .history-item:hover {
+    background: var(--hw-accent-bg);
+  }
+
   /* Toast 提示 */
   .toast-box {
     position: fixed;
@@ -1080,6 +1208,35 @@
       </button>
       <button class="dialog-close-btn" style="background:#eee;color:#333;border-color:#ccc;box-shadow:none;" id="btn-close-xhs-mask">返回</button>
     </div>
+  </div>
+
+  <!-- 历史手账归档抽屉 -->
+  <div class="history-drawer" id="history-drawer">
+    <div class="drawer-content">
+      <div class="drawer-header">
+        <h3>
+          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+          <span>历史心情足迹</span>
+        </h3>
+        <button class="tool-btn" id="btn-close-history">关闭</button>
+      </div>
+      <div class="drawer-list" id="history-list">
+        <!-- 动态渲染历史卡片列表 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 顶部工具条 (音效开关 + 历史心情记录) -->
+  <div class="top-toolbar">
+    <button class="tool-btn" id="btn-history-toggle">
+      <svg class="svg-icon" style="width:14px;height:14px;" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+      <span>心情足迹</span>
+    </button>
+
+    <button class="tool-btn" id="btn-sound-toggle">
+      <svg class="svg-icon" id="sound-icon" style="width:14px;height:14px;" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+      <span id="sound-label">音效 开</span>
+    </button>
   </div>
 
   <!-- 好友分享识别横幅 -->
@@ -1166,14 +1323,14 @@
         <div class="fortune-row">
           <div class="fortune-box do-box">
             <div class="fortune-head do-text">
-              <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
               <span>今日宜 · DO</span>
             </div>
             <div class="fortune-content" id="fortune-do">喝全糖奶茶 / 准点下班</div>
           </div>
           <div class="fortune-box dont-box">
             <div class="fortune-head dont-text">
-              <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               <span>今日忌 · DON'T</span>
             </div>
             <div class="fortune-content" id="fortune-dont">过度内耗 / 秒回工作</div>
@@ -1184,7 +1341,7 @@
         <div class="energy-widget">
           <div class="energy-header">
             <div class="energy-header-left">
-              <svg class="svg-icon" style="width:14px;height:14px;" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <svg class="svg-icon" style="width:14px;height:14px;" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
               <span id="energy-title">精神能量电量</span>
             </div>
             <span id="energy-value">85%</span>
@@ -1357,17 +1514,26 @@ const jit = (rng, a) => (rng() - 0.5) * 2 * a;
 const lerp = (a, b, t) => a + (b - a) * t;
 
 /* ─────────────────────────────────────────────────────────────
-   2. Web Audio 拟真音效系统 (支持各种彩蛋声效)
+   2. Web Audio 拟真音效系统 (支持静音与丰富彩蛋)
    ───────────────────────────────────────────────────────────── */
 class SoundEngine {
-  constructor() { this.ctx = null; }
+  constructor() { 
+    this.ctx = null; 
+    this.isMuted = localStorage.getItem('mood_sound_muted') === 'true';
+  }
   init() {
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (AudioCtx) this.ctx = new AudioCtx();
     }
   }
+  toggleMute() {
+    this.isMuted = !this.isMuted;
+    localStorage.setItem('mood_sound_muted', this.isMuted ? 'true' : 'false');
+    return this.isMuted;
+  }
   playPop() {
+    if (this.isMuted) return;
     try {
       this.init();
       if (!this.ctx) return;
@@ -1386,6 +1552,7 @@ class SoundEngine {
     } catch(e) {}
   }
   playWoosh() {
+    if (this.isMuted) return;
     try {
       this.init();
       if (!this.ctx) return;
@@ -1404,6 +1571,7 @@ class SoundEngine {
     } catch(e) {}
   }
   playMagic() {
+    if (this.isMuted) return;
     try {
       this.init();
       if (!this.ctx) return;
@@ -1424,6 +1592,7 @@ class SoundEngine {
     } catch(e) {}
   }
   playDizzyBoing() {
+    if (this.isMuted) return;
     try {
       this.init();
       if (!this.ctx) return;
@@ -1442,6 +1611,7 @@ class SoundEngine {
     } catch(e) {}
   }
   playCoin() {
+    if (this.isMuted) return;
     try {
       this.init();
       if (!this.ctx) return;
@@ -1665,7 +1835,6 @@ function triggerEggBanner(text) {
   setTimeout(() => eggBanner.classList.remove('show'), 3000);
 }
 
-// 产生 SVG 漂浮粒子特效 (猫爪/金币/爱心/星星/咖啡豆)
 function spawnSvgFx(type, count = 15, sourceRect = null) {
   const rect = sourceRect || document.getElementById('avatar-stage').getBoundingClientRect();
   const startX = rect.left + rect.width / 2;
@@ -1709,7 +1878,7 @@ function spawnSvgFx(type, count = 15, sourceRect = null) {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   6. 小人手绘渲染引擎 (包含彩蛋形态：猫咪、暴富、被戳晕、锦鲤)
+   6. 小人手绘渲染引擎 (多变发型/服装/动作/道具系统)
    ───────────────────────────────────────────────────────────── */
 let eggState = {
   isDizzy: false,
@@ -1738,10 +1907,11 @@ function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
     [cx + 85, cy + 156]
   ], { w: 3.2, wob: 2.2, color: colors.ink, alpha: 0.35 });
 
-  // 2. 身体与服装
+  // 2. 身体与服装 (4 种服饰风格随机轮换)
   const bodyW = 76 + jit(rng, 6);
   const bodyH = 88 + jit(rng, 6);
   const bodyTop = cy + 14;
+  const outfitStyle = Math.floor(rng() * 4);
 
   const bodyPts = [
     [cx - bodyW * 0.72, bodyTop],
@@ -1754,15 +1924,41 @@ function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
   polyFill(ctx, rng, bodyPts, colors.accent, eggState.isKoi ? 0.45 : 0.22);
   strokePts(ctx, rng, bodyPts, { w: 3.6, close: true, color: colors.ink });
 
-  // 身体图案
+  // 服装细节
   if (eggState.isKoi) {
     for (let y = bodyTop + 20; y < bodyTop + bodyH - 10; y += 16) {
       strokePts(ctx, rng, ellipsePts(cx, y, 16, 8, 6, 0, Math.PI), { w: 2.5, color: '#B87C14' });
     }
-  } else {
+  } else if (outfitStyle === 0) {
+    // 经典横条纹
     for (let y = bodyTop + 20; y < bodyTop + bodyH - 8; y += 18) {
       line(ctx, rng, cx - bodyW * 0.75, y, cx + bodyW * 0.75, y, { w: 2.2, color: colors.ink, alpha: 0.5 });
     }
+  } else if (outfitStyle === 1) {
+    // 背带工装裤
+    line(ctx, rng, cx - 18, bodyTop, cx - 18, bodyTop + 35, { w: 3, color: colors.ink });
+    line(ctx, rng, cx + 18, bodyTop, cx + 18, bodyTop + 35, { w: 3, color: colors.ink });
+    const pocket = [
+      [cx - 14, bodyTop + 34],
+      [cx + 14, bodyTop + 34],
+      [cx + 14, bodyTop + 54],
+      [cx - 14, bodyTop + 54]
+    ];
+    polyFill(ctx, rng, pocket, colors.accent, 0.4);
+    strokePts(ctx, rng, pocket, { w: 2.2, close: true, color: colors.ink });
+  } else if (outfitStyle === 2) {
+    // 领带 / 领结
+    strokePts(ctx, rng, [[cx - 8, bodyTop + 6], [cx + 8, bodyTop + 6], [cx, bodyTop + 14]], { w: 2.2, close: true, color: colors.ink });
+    strokePts(ctx, rng, [[cx - 6, bodyTop + 14], [cx + 6, bodyTop + 14], [cx, bodyTop + 36]], { w: 2.2, close: true, color: colors.ink });
+  } else {
+    // 连帽衫大前袋
+    const pouch = [
+      [cx - 24, bodyTop + 38],
+      [cx + 24, bodyTop + 38],
+      [cx + 20, bodyTop + 64],
+      [cx - 20, bodyTop + 64]
+    ];
+    strokePts(ctx, rng, pouch, { w: 2.2, close: true, color: colors.ink });
   }
 
   // 3. 双腿与鞋子
@@ -1773,7 +1969,7 @@ function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
   line(ctx, rng, cx + 26, legY0, cx + 30, legY1, { w: 4, color: colors.ink });
   blobFill(ctx, rng, cx + 40, legY1 + 4, 12, 7, colors.ink);
 
-  // 4. 手臂与手持道具
+  // 4. 手臂与手持道具姿态
   const shoulderY = bodyTop + 12;
 
   if (eggState.specialKeyword === 'cat') {
@@ -1789,13 +1985,15 @@ function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
     drawHandDrawnStar(ctx, rng, cx + bodyW * 1.15, shoulderY - 45, 16, colors);
     line(ctx, rng, cx + bodyW * 1.1, shoulderY - 25, cx + bodyW * 1.15, shoulderY - 45, { w: 3, color: '#B87C14' });
   } else if (moodKey === 'happy') {
+    // 双手欢呼 + 气球
     line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 1.15, shoulderY - 38, { w: 3.6, color: colors.ink });
     line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 1.15, shoulderY - 38, { w: 3.6, color: colors.ink });
     const bx = cx + bodyW * 1.25, by = shoulderY - 70;
     line(ctx, rng, cx + bodyW * 1.15, shoulderY - 38, bx, by + 18, { w: 1.8, color: colors.ink });
     blobFill(ctx, rng, bx, by, 16, 20, colors.accent, 0.85);
     strokePts(ctx, rng, ellipsePts(bx, by, 16, 20, 14), { w: 2.5, close: true, color: colors.ink });
-  } else if (moodKey === 'chill') {
+  } else if (moodKey === 'chill' || eggState.specialKeyword === 'coffee') {
+    // 叉腰 + 咖啡杯
     line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 0.95, shoulderY + 22, { w: 3.6, color: colors.ink });
     line(ctx, rng, cx - bodyW * 0.95, shoulderY + 22, cx - bodyW * 0.65, shoulderY + 44, { w: 3.6, color: colors.ink });
     line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 1.05, shoulderY + 18, { w: 3.6, color: colors.ink });
@@ -1805,6 +2003,20 @@ function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
     strokePts(ctx, rng, cup, { w: 2.2, close: true, color: colors.ink });
     line(ctx, rng, mx - 2, my - 9, mx - 2, my - 16, { w: 1.8, color: colors.accent });
     line(ctx, rng, mx + 2, my - 9, mx + 2, my - 16, { w: 1.8, color: colors.accent });
+  } else if (moodKey === 'curious') {
+    // 托下巴思考 + 放大镜
+    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 0.85, shoulderY + 28, { w: 3.6, color: colors.ink });
+    line(ctx, rng, cx - bodyW * 0.85, shoulderY + 28, cx - 12, shoulderY - 8, { w: 3.6, color: colors.ink });
+    const lx = cx + bodyW * 0.95, ly = shoulderY + 10;
+    line(ctx, rng, cx + bodyW * 0.68, shoulderY, lx, ly, { w: 3.6, color: colors.ink });
+    strokePts(ctx, rng, ellipsePts(lx + 8, ly - 8, 11, 11, 12), { w: 2.5, close: true, color: colors.accent });
+    line(ctx, rng, lx + 16, ly, lx + 24, ly + 8, { w: 3, color: colors.ink });
+  } else if (moodKey === 'cozy') {
+    // 怀抱软绵枕头 / 弯月
+    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - 14, shoulderY + 30, { w: 3.6, color: colors.ink });
+    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + 14, shoulderY + 30, { w: 3.6, color: colors.ink });
+    blobFill(ctx, rng, cx, shoulderY + 28, 18, 12, colors.accent, 0.4);
+    strokePts(ctx, rng, ellipsePts(cx, shoulderY + 28, 18, 12, 12), { w: 2.2, close: true, color: colors.ink });
   } else {
     line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 0.9, shoulderY + 38, { w: 3.6, color: colors.ink });
     line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 0.9, shoulderY + 38, { w: 3.6, color: colors.ink });
@@ -1820,7 +2032,8 @@ function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
   blobFill(ctx, rng, cx - headR * 0.58, headCY + 15, 11, 7, '#f59e9e', 0.55);
   blobFill(ctx, rng, cx + headR * 0.58, headCY + 15, 11, 7, '#f59e9e', 0.55);
 
-  // 6. 发型与头饰
+  // 6. 发型与头饰 (7 种款式系统)
+  const hairStyle = Math.floor(rng() * 7);
   if (eggState.specialKeyword === 'cat') {
     const earL = [[cx - headR * 0.7, headCY - headR * 0.6], [cx - headR * 0.3, headCY - headR * 0.9], [cx - headR * 0.8, headCY - headR * 1.15]];
     const earR = [[cx + headR * 0.7, headCY - headR * 0.6], [cx + headR * 0.3, headCY - headR * 0.9], [cx + headR * 0.8, headCY - headR * 1.15]];
@@ -1840,13 +2053,56 @@ function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
     ];
     polyFill(ctx, rng, crown, '#FFD700');
     strokePts(ctx, rng, crown, { w: 3, close: true, color: '#B87C14' });
-  } else {
+  } else if (hairStyle === 0) {
+    // 萌系豆芽呆毛
+    line(ctx, rng, cx, headCY - headR, cx - 12, headCY - headR - 28, { w: 3.5, color: colors.ink });
+    line(ctx, rng, cx + 4, headCY - headR, cx + 16, headCY - headR - 24, { w: 3.2, color: colors.ink });
+    blobFill(ctx, rng, cx - 14, headCY - headR - 28, 5, 4, colors.accent);
+  } else if (hairStyle === 1) {
+    // 齐刘海
     const hairPts = ellipsePts(cx, headCY, headR * 1.04, headR * 1.04, 14, Math.PI * 0.88, Math.PI * 2.12);
     strokePts(ctx, rng, hairPts, { w: 5, color: colors.ink });
-    line(ctx, rng, cx, headCY - headR, cx - 12, headCY - headR - 26, { w: 3.5, color: colors.ink });
+  } else if (hairStyle === 2) {
+    // 蓬松卷发
+    for (let angle = Math.PI * 0.78; angle <= Math.PI * 2.22; angle += 0.28) {
+      const hx = cx + Math.cos(angle) * (headR + 8);
+      const hy = headCY + Math.sin(angle) * (headR + 8);
+      blobFill(ctx, rng, hx, hy, 13, 13, colors.ink, 0.88);
+    }
+  } else if (hairStyle === 3) {
+    // 贝雷画家帽
+    const hatPts = [
+      [cx - headR * 0.9, headCY - headR * 0.45],
+      [cx + headR * 0.9, headCY - headR * 0.75],
+      [cx + headR * 0.45, headCY - headR * 1.25],
+      [cx - headR * 0.65, headCY - headR * 1.05]
+    ];
+    polyFill(ctx, rng, hatPts, colors.accent);
+    strokePts(ctx, rng, hatPts, { w: 3.2, close: true, color: colors.ink });
+    blobFill(ctx, rng, cx, headCY - headR * 1.2, 7, 7, colors.paper);
+    strokePts(ctx, rng, ellipsePts(cx, headCY - headR * 1.2, 7, 7), { w: 2, close: true, color: colors.ink });
+  } else if (hairStyle === 4) {
+    // 双丸子头
+    blobFill(ctx, rng, cx - headR * 0.8, headCY - headR * 0.7, 14, 14, colors.ink, 0.88);
+    blobFill(ctx, rng, cx + headR * 0.8, headCY - headR * 0.7, 14, 14, colors.ink, 0.88);
+  } else if (hairStyle === 5) {
+    // 头戴降噪耳机
+    const headBand = ellipsePts(cx, headCY, headR * 1.15, headR * 1.15, 12, Math.PI * 1.1, Math.PI * 1.9);
+    strokePts(ctx, rng, headBand, { w: 4, color: colors.ink });
+    blobFill(ctx, rng, cx - headR * 1.05, headCY + 2, 12, 18, colors.accent);
+    strokePts(ctx, rng, ellipsePts(cx - headR * 1.05, headCY + 2, 12, 18, 8), { w: 2.5, close: true, color: colors.ink });
+    blobFill(ctx, rng, cx + headR * 1.05, headCY + 2, 12, 18, colors.accent);
+    strokePts(ctx, rng, ellipsePts(cx + headR * 1.05, headCY + 2, 12, 18, 8), { w: 2.5, close: true, color: colors.ink });
+  } else {
+    // 针织毛线帽
+    const knitCap = ellipsePts(cx, headCY - headR * 0.3, headR * 1.08, headR * 0.9, 14, Math.PI * 1.0, Math.PI * 2.0);
+    polyFill(ctx, rng, knitCap, colors.accent);
+    strokePts(ctx, rng, knitCap, { w: 3.5, color: colors.ink });
+    blobFill(ctx, rng, cx, headCY - headR * 1.25, 9, 9, colors.paper);
+    strokePts(ctx, rng, ellipsePts(cx, headCY - headR * 1.25, 9, 9), { w: 2, close: true, color: colors.ink });
   }
 
-  // 7. 眼睛与神态
+  // 7. 眼睛与神态 (完美结合心情与手绘质感)
   const eyeSpan = 21 + jit(rng, 3);
   const eyeY = headCY + 2;
 
@@ -1875,6 +2131,10 @@ function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
     line(ctx, rng, cx + eyeSpan + 9, eyeY - 6, cx + eyeSpan - 7, eyeY + 2, { w: 3.8, color: colors.ink });
     const zx = cx - 11, zy = eyeY + 20;
     strokePts(ctx, rng, [[zx, zy], [zx+5, zy-4], [zx+10, zy+4], [zx+15, zy-4], [zx+20, zy]], { w: 2.8, color: colors.ink });
+  } else if (moodKey === 'cozy') {
+    strokePts(ctx, rng, ellipsePts(cx - eyeSpan, eyeY + 2, 9, 6, 6, 0.3, Math.PI - 0.3), { w: 3.2, color: colors.ink });
+    strokePts(ctx, rng, ellipsePts(cx + eyeSpan, eyeY + 2, 9, 6, 6, 0.3, Math.PI - 0.3), { w: 3.2, color: colors.ink });
+    strokePts(ctx, rng, ellipsePts(cx, eyeY + 15, 7, 4, 6, 0.3, Math.PI - 0.3), { w: 2.6, color: colors.ink });
   } else {
     blobFill(ctx, rng, cx - eyeSpan, eyeY, 6, 6, colors.ink);
     blobFill(ctx, rng, cx - eyeSpan - 2, eyeY - 2, 2, 2, '#fff');
@@ -1889,10 +2149,13 @@ function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
     drawHandDrawnStar(ctx, rng, cx - headR * 0.9, headCY - headR * 0.4, 12, colors);
   } else if (moodKey === 'happy') {
     drawHandDrawnStar(ctx, rng, cx + headR * 0.9, headCY - headR * 0.5, 12, colors);
-  } else if (moodKey === 'tired') {
+    drawHandDrawnStar(ctx, rng, cx - headR * 0.85, headCY - headR * 0.3, 8, colors);
+  } else if (moodKey === 'tired' || moodKey === 'cozy') {
     drawHandDrawnZzz(ctx, rng, cx + headR * 0.75, headCY - headR * 0.5, colors);
   } else if (moodKey === 'rage') {
     drawHandDrawnRage(ctx, rng, cx + headR * 0.75, headCY - headR * 0.5, colors);
+  } else if (moodKey === 'curious') {
+    drawHandDrawnSpark(ctx, rng, cx + headR * 0.8, headCY - headR * 0.5, colors);
   }
 }
 
@@ -1943,6 +2206,11 @@ function drawHandDrawnRage(ctx, rng, x, y, colors) {
   line(ctx, rng, x, y - 7, x, y + 7, { w: 3, color: '#c43a3a' });
 }
 
+function drawHandDrawnSpark(ctx, rng, x, y, colors) {
+  line(ctx, rng, x - 9, y, x + 9, y, { w: 2.4, color: colors.accent });
+  line(ctx, rng, x, y - 9, x, y + 9, { w: 2.4, color: colors.accent });
+}
+
 /* ─────────────────────────────────────────────────────────────
    7. 手绘波浪分割线
    ───────────────────────────────────────────────────────────── */
@@ -1968,27 +2236,85 @@ function renderWaveDivider() {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   8. 动态二维码生成器
+   8. 动态二维码生成器 (含离线/加载失败备用方案)
    ───────────────────────────────────────────────────────────── */
-let qrcodeInstance = null;
-
 function updateQRCode(shareURL) {
   const qrContainer = document.getElementById('card-qrcode');
   qrContainer.innerHTML = '';
   try {
-    qrcodeInstance = new QRCode(qrContainer, {
-      text: shareURL,
-      width: 40,
-      height: 40,
-      colorDark: '#000000',
-      colorLight: '#ffffff',
-      correctLevel: QRCode.CorrectLevel.L
-    });
+    if (typeof QRCode !== 'undefined') {
+      new QRCode(qrContainer, {
+        text: shareURL,
+        width: 40,
+        height: 40,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.L
+      });
+    } else {
+      // 优雅降级手绘 SVG 码图
+      qrContainer.innerHTML = `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/></svg>`;
+    }
   } catch (e) {}
 }
 
 /* ─────────────────────────────────────────────────────────────
-   9. 界面状态机与事件响应 (Viral & Easter Egg Engine)
+   9. 历史记录存档管理器 (History Diary Manager)
+   ───────────────────────────────────────────────────────────── */
+const HISTORY_STORAGE_KEY = 'mood_history_records';
+
+function saveCardToHistory(record) {
+  try {
+    const list = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || '[]');
+    // 查重后置顶
+    const filtered = list.filter(item => item.seed !== record.seed);
+    filtered.unshift(record);
+    localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(filtered.slice(0, 15)));
+  } catch (e) {}
+}
+
+function renderHistoryDrawer() {
+  const historyList = document.getElementById('history-list');
+  try {
+    const list = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || '[]');
+    if (list.length === 0) {
+      historyList.innerHTML = '<div style="text-align:center;padding:20px;font-size:14px;color:var(--hw-ink-soft);">还没有保存过心情手账～快去生成第一张吧！</div>';
+      return;
+    }
+    historyList.innerHTML = list.map((item, idx) => `
+      <div class="history-item" data-seed="${item.seed}" data-mood="${item.mood}" data-name="${item.name || ''}" data-theme="${item.theme || 'pine'}">
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <div style="font-weight:bold;font-size:15px;color:var(--hw-ink);">${item.date} · ${item.tag}</div>
+          <div style="font-size:12px;color:var(--hw-ink-soft);max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.quote}</div>
+        </div>
+        <div style="font-size:13px;font-weight:bold;color:var(--hw-accent-ink);display:inline-flex;align-items:center;gap:3px;"><span>回看</span><svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+    `).join('');
+
+    // 绑定点击回溯
+    historyList.querySelectorAll('.history-item').forEach(el => {
+      el.addEventListener('click', () => {
+        sound.playWoosh();
+        const { seed, mood, name, theme } = el.dataset;
+        if (name) userInput.value = name;
+        if (theme) {
+          currentTheme = theme;
+          document.documentElement.setAttribute('data-theme', theme);
+          document.body.setAttribute('data-theme', theme);
+          themeCircles.forEach(c => c.classList.toggle('active', c.dataset.theme === theme));
+        }
+        updateAppCard(seed, mood, false);
+        document.getElementById('history-drawer').classList.remove('active');
+        showToast('已回溯历史心情手账！');
+      });
+    });
+  } catch (e) {
+    historyList.innerHTML = '<div style="text-align:center;padding:20px;">读取历史记录失败</div>';
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   10. 界面状态机与事件响应 (Viral & Easter Egg Engine)
    ───────────────────────────────────────────────────────────── */
 const avatarCanvas = document.getElementById('avatarCanvas');
 const userInput = document.getElementById('userInput');
@@ -2027,6 +2353,12 @@ const btnMakeMyOwn = document.getElementById('btn-make-my-own');
 const toast = document.getElementById('toast');
 const toastText = document.getElementById('toast-text');
 const visitorCountEl = document.getElementById('random-visitor-count');
+const btnSoundToggle = document.getElementById('btn-sound-toggle');
+const soundIcon = document.getElementById('sound-icon');
+const soundLabel = document.getElementById('sound-label');
+const btnHistoryToggle = document.getElementById('btn-history-toggle');
+const historyDrawer = document.getElementById('history-drawer');
+const btnCloseHistory = document.getElementById('btn-close-history');
 
 let currentMoodKey = 'happy';
 let currentSeed = 'seed-' + Date.now();
@@ -2036,7 +2368,38 @@ const baseVisitor = 2380 + Math.floor(Math.random() * 320);
 visitorCountEl.textContent = baseVisitor.toLocaleString();
 
 const now = new Date();
-dateDisplay.textContent = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
+const formattedDate = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
+dateDisplay.textContent = formattedDate;
+
+// 初始化音效开关展示
+function updateSoundButtonState() {
+  if (sound.isMuted) {
+    soundLabel.textContent = '音效 关';
+    soundIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>`;
+  } else {
+    soundLabel.textContent = '音效 开';
+    soundIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>`;
+  }
+}
+updateSoundButtonState();
+
+btnSoundToggle.addEventListener('click', () => {
+  const isMuted = sound.toggleMute();
+  updateSoundButtonState();
+  showToast(isMuted ? '已静音' : '已开启手绘音效');
+  if (!isMuted) sound.playPop();
+});
+
+// 历史抽屉开关
+btnHistoryToggle.addEventListener('click', () => {
+  sound.playPop();
+  renderHistoryDrawer();
+  historyDrawer.classList.add('active');
+});
+
+btnCloseHistory.addEventListener('click', () => {
+  historyDrawer.classList.remove('active');
+});
 
 function showToast(msg) {
   toastText.textContent = msg;
@@ -2054,7 +2417,7 @@ function buildShareURL() {
   return url.toString();
 }
 
-function updateAppCard(seed, moodKey = null) {
+function updateAppCard(seed, moodKey = null, shouldSave = true) {
   currentSeed = seed || 'default';
   const rng = rngFrom(currentSeed);
 
@@ -2131,10 +2494,23 @@ function updateAppCard(seed, moodKey = null) {
   renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey);
   renderWaveDivider();
   updateQRCode(buildShareURL());
+
+  // 存入手账历史
+  if (shouldSave) {
+    saveCardToHistory({
+      date: formattedDate,
+      seed: currentSeed,
+      mood: currentMoodKey,
+      name: authorName,
+      tag: tagText.textContent,
+      quote: quoteText.textContent,
+      theme: currentTheme
+    });
+  }
 }
 
 /* ─────────────────────────────────────────────────────────────
-   10. 彩蛋交互系统 (Combo Pokes & Long Press Hearts)
+   11. 彩蛋交互系统 (Combo Pokes & Long Press Hearts)
    ───────────────────────────────────────────────────────────── */
 let pokeCount = 0;
 let lastPokeTime = 0;
@@ -2161,18 +2537,21 @@ avatarStage.addEventListener('click', () => {
     quoteText.textContent = '“恭喜解锁隐藏锦鲤款！今日所有愿望即刻生效！”';
     pokeTipText.textContent = '已解锁超稀有金色锦鲤！';
 
-    // 触发金币与星星粒子喷射
     spawnSvgFx('star', 24);
     spawnSvgFx('coin', 16);
     moodCard.classList.add('koi-golden-pulse');
     triggerEggBanner('终极彩蛋：恭喜解锁黄金锦鲤隐藏款！');
 
-    confetti({
-      particleCount: 80,
-      spread: 90,
-      origin: { y: 0.6 },
-      colors: ['#FFD700', '#FFA500', '#FF6347', '#FFE4B5']
-    });
+    try {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 80,
+          spread: 90,
+          origin: { y: 0.6 },
+          colors: ['#FFD700', '#FFA500', '#FF6347', '#FFE4B5']
+        });
+      }
+    } catch(e) {}
 
     renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey);
     showToast('恭喜触发 10 连击隐藏锦鲤彩蛋！');
@@ -2185,7 +2564,6 @@ avatarStage.addEventListener('click', () => {
     eggState.isDizzy = true;
     pokeTipText.textContent = '别戳啦！脑浆都晃匀啦～';
     
-    // 全卡片晕厥摇晃特效 + 旋转小星星
     moodCard.classList.remove('shake-dizzy');
     void moodCard.offsetWidth; // 触发 reflow
     moodCard.classList.add('shake-dizzy');
@@ -2226,7 +2604,7 @@ function triggerHeartEgg() {
   showToast('触发摸摸头心动彩蛋！');
 }
 
-avatarStage.addEventListener('touchstart', (e) => {
+avatarStage.addEventListener('touchstart', () => {
   longPressTimer = setTimeout(triggerHeartEgg, 550);
 }, { passive: true });
 
@@ -2243,7 +2621,7 @@ avatarStage.addEventListener('mouseup', () => {
 });
 
 /* ─────────────────────────────────────────────────────────────
-   11. 朋友圈 / 小红书 一键分享系统
+   12. 朋友圈 / 小红书 一键分享系统
    ───────────────────────────────────────────────────────────── */
 const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
 
@@ -2325,7 +2703,7 @@ btnCloseWechatMask.addEventListener('click', () => wechatMask.classList.remove('
 btnCloseXhsMask.addEventListener('click', () => xhsMask.classList.remove('active'));
 
 /* ─────────────────────────────────────────────────────────────
-   12. 其他常规交互 (盲盒抽卡 / 底纹 / 色调 / 输入)
+   13. 其他常规交互 (盲盒抽卡 / 底纹 / 色调 / 输入)
    ───────────────────────────────────────────────────────────── */
 userInput.addEventListener('input', () => {
   const val = userInput.value.trim();
@@ -2395,12 +2773,14 @@ btnRandom.addEventListener('click', () => {
   setTimeout(() => { moodCard.style.transform = 'none'; }, 200);
 
   try {
-    confetti({
-      particleCount: 50,
-      spread: 70,
-      origin: { y: 0.65 },
-      colors: ['#53A548', '#C4553B', '#F5D061', '#4A6FA5', '#E26D46']
-    });
+    if (typeof confetti === 'function') {
+      confetti({
+        particleCount: 50,
+        spread: 70,
+        origin: { y: 0.65 },
+        colors: ['#53A548', '#C4553B', '#F5D061', '#4A6FA5', '#E26D46']
+      });
+    }
   } catch (e) {}
 
   updateAppCard('rand-' + randNum);
@@ -2461,7 +2841,14 @@ function initFromURL() {
   }
 }
 
-initFromURL();
+// 确保网页字体准备就绪后进行首次超清渲染
+if (document.fonts) {
+  document.fonts.ready.then(() => {
+    initFromURL();
+  });
+} else {
+  initFromURL();
+}
 </script>
 </body>
 </html>
