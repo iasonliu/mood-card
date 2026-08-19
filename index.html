@@ -1901,6 +1901,13 @@ const MOOD_DATABASE = {
 /* ─────────────────────────────────────────────────────────────
    7. 扩大化小人 + 丰富背景环境 + 宠物伴侣 Canvas 渲染引擎
    ───────────────────────────────────────────────────────────── */
+let eggState = {
+  isDizzy: false,
+  isKoi: false,
+  isHeart: false,
+  specialKeyword: null
+};
+
 function renderDoodleScene(canvas, seedStr, moodKey, animY = 0) {
   const ctx = canvas.getContext('2d');
   const W = canvas.width;
