@@ -116,14 +116,14 @@
     --card-shadow: 6px 8px 0px var(--hw-ink);
   }
 
-  /* 彩蛋模式金色锦鲤主题 */
+  /* 彩蛋模式金色锦鲤专属主题 */
   html[data-egg="koi"] {
     --hw-card-bg: #FFFDF0 !important;
     --hw-accent: #E5A93B !important;
     --hw-accent-ink: #B87C14 !important;
     --hw-accent-bg: rgba(229, 169, 59, 0.22) !important;
     --hw-stamp: #E5A93B !important;
-    --card-shadow: 0 0 20px rgba(229, 169, 59, 0.6), 6px 8px 0px #3D2B12 !important;
+    --card-shadow: 0 0 25px rgba(229, 169, 59, 0.65), 6px 8px 0px #3D2B12 !important;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -141,10 +141,95 @@
     padding: 20px 14px 60px;
     transition: background-color 0.3s ease, color 0.3s ease;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
   /* ─────────────────────────────────────────────────────────────
-     2. 社交一键分享微信/小红书引导蒙层 (Share Guide Modal)
+     2. 全屏特效层与动画系统 (Egg FX Layer)
+     ───────────────────────────────────────────────────────────── */
+  .fx-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+  }
+
+  .fx-particle {
+    position: absolute;
+    animation: floatUpAndFade 1.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    pointer-events: none;
+  }
+
+  @keyframes floatUpAndFade {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 0, 0) scale(0.4) rotate(0deg);
+    }
+    15% {
+      opacity: 1;
+      transform: translate3d(var(--dx1), -30px, 0) scale(1.15) rotate(var(--rot1));
+    }
+    100% {
+      opacity: 0;
+      transform: translate3d(var(--dx2), -180px, 0) scale(0.8) rotate(var(--rot2));
+    }
+  }
+
+  /* 晕厥震颤动画 */
+  .shake-dizzy {
+    animation: shakeDizzy 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
+
+  @keyframes shakeDizzy {
+    10%, 90% { transform: translate3d(-3px, 0, 0) rotate(-1.5deg); }
+    20%, 80% { transform: translate3d(4px, 0, 0) rotate(2deg); }
+    30%, 50%, 70% { transform: translate3d(-5px, 0, 0) rotate(-2deg); }
+    40%, 60% { transform: translate3d(5px, 0, 0) rotate(1.5deg); }
+  }
+
+  /* 锦鲤金光四射动画 */
+  .koi-golden-pulse {
+    animation: goldenPulse 1.8s infinite alternate ease-in-out;
+  }
+
+  @keyframes goldenPulse {
+    0% { filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5)); transform: scale(1); }
+    100% { filter: drop-shadow(0 0 24px rgba(255, 215, 0, 0.95)); transform: scale(1.02); }
+  }
+
+  /* 彩蛋触发横幅提示 */
+  .egg-banner {
+    position: absolute;
+    top: -45px;
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    background: #FFD700;
+    color: #4A3000;
+    border: 2px solid #4A3000;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 2px 4px 0 #4A3000;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+    z-index: 20;
+    white-space: nowrap;
+  }
+
+  .egg-banner.show {
+    top: 6px;
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+
+  /* ─────────────────────────────────────────────────────────────
+     3. 社交一键分享微信/小红书引导蒙层 (Share Guide Modal)
      ───────────────────────────────────────────────────────────── */
   .share-mask {
     position: fixed;
@@ -233,7 +318,7 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     3. 好友分享裂变横幅 (Viral Friend Banner)
+     4. 好友分享裂变横幅 (Viral Friend Banner)
      ───────────────────────────────────────────────────────────── */
   .friend-banner {
     width: 100%;
@@ -274,7 +359,7 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     4. 顶部品牌与氛围
+     5. 顶部品牌与氛围
      ───────────────────────────────────────────────────────────── */
   .app-header {
     text-align: center;
@@ -296,14 +381,6 @@
     margin-bottom: 6px;
     font-weight: 700;
     letter-spacing: 0.3px;
-  }
-
-  .brand-pill svg {
-    width: 15px;
-    height: 15px;
-    stroke: currentColor;
-    stroke-width: 2;
-    fill: none;
   }
 
   .app-title {
@@ -336,7 +413,7 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     5. 核心手账卡片
+     6. 核心手账卡片
      ───────────────────────────────────────────────────────────── */
   .app-layout {
     width: 100%;
@@ -441,6 +518,7 @@
     fill: none;
     display: inline-block;
     vertical-align: middle;
+    flex-shrink: 0;
   }
 
   /* 小人手绘舞台 */
@@ -699,7 +777,7 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     6. 控制操作面板 (一键发朋友圈 / 小红书 / 抽盲盒 / 保存)
+     7. 控制操作面板 (一键发朋友圈 / 小红书 / 抽盲盒 / 保存)
      ───────────────────────────────────────────────────────────── */
   .ctrl-panel {
     width: 100%;
@@ -716,14 +794,25 @@
   .input-wrapper {
     position: relative;
     width: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 12px;
+    width: 18px;
+    height: 18px;
+    color: var(--hw-ink-soft);
+    pointer-events: none;
   }
 
   .sketch-input {
     width: 100%;
     height: 46px;
-    padding: 0 14px;
+    padding: 0 14px 0 38px;
     font-family: inherit;
-    font-size: 17px;
+    font-size: 16px;
     background: var(--hw-paper-tint);
     border: 2px solid var(--hw-ink);
     border-radius: 10px;
@@ -795,7 +884,7 @@
   }
 
   .option-btn {
-    padding: 3px 8px;
+    padding: 4px 8px;
     font-size: 12px;
     border: 1.5px solid var(--hw-ink);
     border-radius: 6px;
@@ -804,6 +893,9 @@
     font-family: inherit;
     color: var(--hw-ink);
     font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .option-btn.active {
@@ -943,6 +1035,9 @@
 
 <body>
 
+  <!-- 全屏特效层 (用于浮动爱心/金币/猫爪/星星 SVG 特效) -->
+  <div class="fx-overlay" id="fx-overlay"></div>
+
   <!-- 浮动 Toast (纯 SVG 矢量) -->
   <div class="toast-box" id="toast">
     <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
@@ -962,7 +1057,7 @@
       </h3>
       <p>点击右上角 <b>「···」</b><br>即可将今日手绘卡片 <b>「分享到朋友圈」</b> 或 <b>「发送给好友」</b>！</p>
       <button class="dialog-close-btn" id="btn-close-wechat-mask">
-        <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
         <span>我知道啦</span>
       </button>
     </div>
@@ -1009,7 +1104,7 @@
       <svg class="svg-icon" style="width:30px;height:30px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
       <span>今日精神状态诊断书</span>
     </h1>
-    <p class="app-subtitle">手绘小人图鉴 · 能量电量 · 运势宜忌 · 一键生成</p>
+    <p class="app-subtitle">手绘小人图鉴 · 能量电量 · 运势宜忌 · 隐藏彩蛋</p>
     <div class="visitor-pill" id="visitor-badge">
       <svg class="svg-icon" style="width:13px;height:13px;" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
       <span>今日已有 <b id="random-visitor-count">2,389</b> 位漫游者领取心情</span>
@@ -1020,6 +1115,12 @@
   <main class="app-layout">
     
     <div class="card-container">
+      <!-- 彩蛋横幅 -->
+      <div class="egg-banner" id="egg-banner">
+        <svg class="svg-icon" style="width:16px;height:16px;" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span id="egg-banner-text">已解锁隐藏彩蛋！</span>
+      </div>
+
       <article class="mood-card pattern-grid" id="mood-card">
         <div class="tape-strip"></div>
 
@@ -1041,7 +1142,7 @@
           <span id="persona-text">情绪物种：宇宙漫游级快乐土豆</span>
         </div>
 
-        <!-- 手绘小人舞台 (长按有心动彩蛋，连戳5次有晕厥彩蛋，连戳10次有锦鲤彩蛋) -->
+        <!-- 手绘小人舞台 (长按有心动爱心雨，连戳5次晕厥，连戳10次锦鲤金雨，输入猫咪/暴富/咖啡有专属动画) -->
         <div class="stage-box" id="avatar-stage" title="连戳我有隐藏彩蛋哦！">
           <canvas class="doodle-canvas" id="avatarCanvas" width="480" height="480"></canvas>
           <div class="poke-badge" id="stage-badge">
@@ -1120,6 +1221,7 @@
     <section class="ctrl-panel">
       <!-- 文本输入 (支持猫/暴富/咖啡等彩蛋词) -->
       <div class="input-wrapper">
+        <svg class="svg-icon input-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
         <input type="text" id="userInput" class="sketch-input" placeholder="输入昵称 (试输入'猫咪' / '暴富' / '咖啡'有彩蛋)..." maxlength="25" autocomplete="off">
       </div>
 
@@ -1162,10 +1264,22 @@
         <div>
           <div class="panel-section-title" style="margin-bottom:3px;"><span>底纹</span></div>
           <div class="pill-selector">
-            <button class="option-btn active" data-pattern="grid">方格</button>
-            <button class="option-btn" data-pattern="dots">点阵</button>
-            <button class="option-btn" data-pattern="lines">横线</button>
-            <button class="option-btn" data-pattern="blank">留白</button>
+            <button class="option-btn active" data-pattern="grid">
+              <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              <span>方格</span>
+            </button>
+            <button class="option-btn" data-pattern="dots">
+              <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+              <span>点阵</span>
+            </button>
+            <button class="option-btn" data-pattern="lines">
+              <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+              <span>横线</span>
+            </button>
+            <button class="option-btn" data-pattern="blank">
+              <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+              <span>留白</span>
+            </button>
           </div>
         </div>
 
@@ -1181,7 +1295,7 @@
         </div>
       </div>
 
-      <!-- 一键分享到微信朋友圈 & 小红书核心按钮 (SVG 图标) -->
+      <!-- 一键分享到微信朋友圈 & 小红书核心按钮 (纯 SVG 图标) -->
       <div class="share-direct-grid">
         <button class="share-action-btn btn-wechat" id="btn-share-wechat">
           <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm7 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.42 3.84 7.02L5 22l4.24-2.12c.88.24 1.8.37 2.76.37 5.52 0 10-4.03 10-9s-4.48-9-10-9z"/></svg>
@@ -1194,7 +1308,7 @@
         </button>
       </div>
 
-      <!-- 辅助功能：抽盲盒 & 保存拍立得 (SVG 图标) -->
+      <!-- 辅助功能：抽盲盒 & 保存拍立得 (纯 SVG 图标) -->
       <div class="sub-action-row">
         <button class="sub-btn btn-blindbox" id="btn-random">
           <svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="16" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="8" cy="16" r="1.5"/></svg>
@@ -1243,7 +1357,7 @@ const jit = (rng, a) => (rng() - 0.5) * 2 * a;
 const lerp = (a, b, t) => a + (b - a) * t;
 
 /* ─────────────────────────────────────────────────────────────
-   2. Web Audio 拟真音效系统
+   2. Web Audio 拟真音效系统 (支持各种彩蛋声效)
    ───────────────────────────────────────────────────────────── */
 class SoundEngine {
   constructor() { this.ctx = null; }
@@ -1294,18 +1408,55 @@ class SoundEngine {
       this.init();
       if (!this.ctx) return;
       if (this.ctx.state === 'suspended') this.ctx.resume();
-      const notes = [523.25, 659.25, 783.99, 1046.50];
+      const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
       notes.forEach((freq, i) => {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + i * 0.06);
-        gain.gain.setValueAtTime(0.12, this.ctx.currentTime + i * 0.06);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + i * 0.06 + 0.25);
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + i * 0.05);
+        gain.gain.setValueAtTime(0.12, this.ctx.currentTime + i * 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + i * 0.05 + 0.28);
         osc.connect(gain);
         gain.connect(this.ctx.destination);
-        osc.start(this.ctx.currentTime + i * 0.06);
-        osc.stop(this.ctx.currentTime + i * 0.06 + 0.25);
+        osc.start(this.ctx.currentTime + i * 0.05);
+        osc.stop(this.ctx.currentTime + i * 0.05 + 0.28);
+      });
+    } catch(e) {}
+  }
+  playDizzyBoing() {
+    try {
+      this.init();
+      if (!this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(120, this.ctx.currentTime + 0.35);
+      gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.35);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 0.35);
+    } catch(e) {}
+  }
+  playCoin() {
+    try {
+      this.init();
+      if (!this.ctx) return;
+      if (this.ctx.state === 'suspended') this.ctx.resume();
+      [987.77, 1318.51].forEach((freq, i) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + i * 0.07);
+        gain.gain.setValueAtTime(0.18, this.ctx.currentTime + i * 0.07);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + i * 0.07 + 0.22);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(this.ctx.currentTime + i * 0.07);
+        osc.stop(this.ctx.currentTime + i * 0.07 + 0.22);
       });
     } catch(e) {}
   }
@@ -1502,13 +1653,69 @@ const MOOD_DATABASE = {
 };
 
 /* ─────────────────────────────────────────────────────────────
-   5. 小人手绘渲染引擎 (包含彩蛋形态：猫咪、暴富、被戳晕、锦鲤)
+   5. 彩蛋特效引擎 (SVG Floating Particle FX System)
+   ───────────────────────────────────────────────────────────── */
+const fxOverlay = document.getElementById('fx-overlay');
+const eggBanner = document.getElementById('egg-banner');
+const eggBannerText = document.getElementById('egg-banner-text');
+
+function triggerEggBanner(text) {
+  eggBannerText.textContent = text;
+  eggBanner.classList.add('show');
+  setTimeout(() => eggBanner.classList.remove('show'), 3000);
+}
+
+// 产生 SVG 漂浮粒子特效 (猫爪/金币/爱心/星星/咖啡豆)
+function spawnSvgFx(type, count = 15, sourceRect = null) {
+  const rect = sourceRect || document.getElementById('avatar-stage').getBoundingClientRect();
+  const startX = rect.left + rect.width / 2;
+  const startY = rect.top + rect.height / 2;
+
+  const SVG_SHAPES = {
+    heart: `<svg viewBox="0 0 24 24" width="28" height="28" fill="#FF4757"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
+    coin: `<svg viewBox="0 0 24 24" width="28" height="28" fill="#FFD700" stroke="#B87C14" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><text x="12" y="16" font-size="12" font-weight="bold" text-anchor="middle" fill="#B87C14">¥</text></svg>`,
+    paw: `<svg viewBox="0 0 24 24" width="28" height="28" fill="#53A548"><ellipse cx="12" cy="15" rx="5" ry="4"/><circle cx="6.5" cy="9.5" r="2"/><circle cx="10" cy="7" r="2"/><circle cx="14" cy="7" r="2"/><circle cx="17.5" cy="9.5" r="2"/></svg>`,
+    star: `<svg viewBox="0 0 24 24" width="28" height="28" fill="#FFD700" stroke="#B87C14" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+    coffee: `<svg viewBox="0 0 24 24" width="28" height="28" fill="#8E6BB8" stroke="#3D261C" stroke-width="1.5"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>`
+  };
+
+  const template = SVG_SHAPES[type] || SVG_SHAPES.star;
+
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'fx-particle';
+    el.innerHTML = template;
+
+    const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+    const dist1 = 30 + Math.random() * 50;
+    const dist2 = 80 + Math.random() * 120;
+
+    const dx1 = Math.cos(angle) * dist1;
+    const dx2 = Math.cos(angle) * dist2;
+    const rot1 = (Math.random() - 0.5) * 60 + 'deg';
+    const rot2 = (Math.random() - 0.5) * 180 + 'deg';
+
+    el.style.left = `${startX + (Math.random() - 0.5) * 40}px`;
+    el.style.top = `${startY + (Math.random() - 0.5) * 40}px`;
+    el.style.setProperty('--dx1', `${dx1}px`);
+    el.style.setProperty('--dx2', `${dx2}px`);
+    el.style.setProperty('--rot1', rot1);
+    el.style.setProperty('--rot2', rot2);
+    el.style.animationDelay = `${Math.random() * 0.15}s`;
+
+    fxOverlay.appendChild(el);
+    setTimeout(() => el.remove(), 2000);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   6. 小人手绘渲染引擎 (包含彩蛋形态：猫咪、暴富、被戳晕、锦鲤)
    ───────────────────────────────────────────────────────────── */
 let eggState = {
-  isDizzy: false,   // 连续戳5次晕厥
-  isKoi: false,     // 连续戳10次锦鲤爆发
-  isHeart: false,   // 长按心动爱心眼
-  specialKeyword: null // 猫咪 / 暴富 / 咖啡
+  isDizzy: false,
+  isKoi: false,
+  isHeart: false,
+  specialKeyword: null
 };
 
 function renderDoodleAvatar(canvas, seedStr, moodKey, animY = 0) {
@@ -1737,7 +1944,7 @@ function drawHandDrawnRage(ctx, rng, x, y, colors) {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   6. 手绘波浪分割线
+   7. 手绘波浪分割线
    ───────────────────────────────────────────────────────────── */
 function renderWaveDivider() {
   const waveCanvas = document.getElementById('waveCanvas');
@@ -1761,7 +1968,7 @@ function renderWaveDivider() {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   7. 动态二维码生成器
+   8. 动态二维码生成器
    ───────────────────────────────────────────────────────────── */
 let qrcodeInstance = null;
 
@@ -1781,7 +1988,7 @@ function updateQRCode(shareURL) {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   8. 界面状态机与事件响应 (Viral & Easter Egg Engine)
+   9. 界面状态机与事件响应 (Viral & Easter Egg Engine)
    ───────────────────────────────────────────────────────────── */
 const avatarCanvas = document.getElementById('avatarCanvas');
 const userInput = document.getElementById('userInput');
@@ -1860,20 +2067,41 @@ function updateAppCard(seed, moodKey = null) {
 
   const moodData = MOOD_DATABASE[currentMoodKey] || MOOD_DATABASE.happy;
   
-  // 检查特殊彩蛋关键词
+  // 检查特殊彩蛋关键词 (触发专属特效与形态)
   const rawInput = userInput.value.trim().toLowerCase();
   if (rawInput.includes('猫') || rawInput.includes('cat') || rawInput.includes('喵')) {
+    if (eggState.specialKeyword !== 'cat') {
+      sound.playMagic();
+      spawnSvgFx('paw', 18);
+      triggerEggBanner('已触发隐藏彩蛋：喵星人附体！');
+    }
     eggState.specialKeyword = 'cat';
     personaText.textContent = '隐藏款：尊贵的高冷猫主子';
     tagText.textContent = '喵星人附体';
     fortuneDo.textContent = '大口吃肉 / 伸懒腰发呆';
     fortuneDont.textContent = '被无聊人类打扰 / 剪指甲';
-  } else if (rawInput.includes('暴富') || rawInput.includes('发财') || rawInput.includes('money')) {
+  } else if (rawInput.includes('暴富') || rawInput.includes('发财') || rawInput.includes('money') || rawInput.includes('金币')) {
+    if (eggState.specialKeyword !== 'money') {
+      sound.playCoin();
+      spawnSvgFx('coin', 22);
+      triggerEggBanner('已触发隐藏彩蛋：暴富吸金模式！');
+    }
     eggState.specialKeyword = 'money';
     personaText.textContent = '隐藏款：移动吸金暴富锦鲤';
     tagText.textContent = '财运滚滚来';
     fortuneDo.textContent = '买刮刮乐 / 准点数钱';
     fortuneDont.textContent = '冲动借钱 / 精神内耗';
+  } else if (rawInput.includes('咖啡') || rawInput.includes('coffee') || rawInput.includes('拿铁')) {
+    if (eggState.specialKeyword !== 'coffee') {
+      sound.playMagic();
+      spawnSvgFx('coffee', 16);
+      triggerEggBanner('已触发隐藏彩蛋：重度咖啡续命！');
+    }
+    eggState.specialKeyword = 'coffee';
+    personaText.textContent = '隐藏款：全天候咖啡因续命星人';
+    tagText.textContent = '注入灵魂热气';
+    fortuneDo.textContent = '来杯大冰美 / 精神抖擞';
+    fortuneDont.textContent = '空腹猛灌 / 晚上失眠';
   } else {
     eggState.specialKeyword = null;
     personaText.textContent = moodData.persona;
@@ -1906,12 +2134,13 @@ function updateAppCard(seed, moodKey = null) {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   9. 彩蛋交互系统 (Combo Pokes & Long Press Hearts)
+   10. 彩蛋交互系统 (Combo Pokes & Long Press Hearts)
    ───────────────────────────────────────────────────────────── */
 let pokeCount = 0;
 let lastPokeTime = 0;
 let longPressTimer = null;
 
+// 戳小人连续打击彩蛋
 avatarStage.addEventListener('click', () => {
   const nowT = Date.now();
   if (nowT - lastPokeTime < 1200) {
@@ -1922,6 +2151,7 @@ avatarStage.addEventListener('click', () => {
   lastPokeTime = nowT;
 
   if (pokeCount >= 10) {
+    // 10 连击：超级宇宙锦鲤隐藏款爆发！
     sound.playMagic();
     eggState.isKoi = true;
     eggState.isDizzy = false;
@@ -1930,6 +2160,12 @@ avatarStage.addEventListener('click', () => {
     tagText.textContent = '锦鲤附体 暴富幸运';
     quoteText.textContent = '“恭喜解锁隐藏锦鲤款！今日所有愿望即刻生效！”';
     pokeTipText.textContent = '已解锁超稀有金色锦鲤！';
+
+    // 触发金币与星星粒子喷射
+    spawnSvgFx('star', 24);
+    spawnSvgFx('coin', 16);
+    moodCard.classList.add('koi-golden-pulse');
+    triggerEggBanner('终极彩蛋：恭喜解锁黄金锦鲤隐藏款！');
 
     confetti({
       particleCount: 80,
@@ -1944,16 +2180,24 @@ avatarStage.addEventListener('click', () => {
   }
 
   if (pokeCount >= 5) {
-    sound.playPop();
+    // 5 连击：小人被戳晕啦！
+    sound.playDizzyBoing();
     eggState.isDizzy = true;
     pokeTipText.textContent = '别戳啦！脑浆都晃匀啦～';
-    moodCard.style.transform = 'rotate(-3deg) scale(0.96)';
-    setTimeout(() => { moodCard.style.transform = 'none'; }, 200);
+    
+    // 全卡片晕厥摇晃特效 + 旋转小星星
+    moodCard.classList.remove('shake-dizzy');
+    void moodCard.offsetWidth; // 触发 reflow
+    moodCard.classList.add('shake-dizzy');
+    spawnSvgFx('star', 12);
+    triggerEggBanner('小人被你戳晕啦！再连戳5次试试？');
+
     renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey);
-    showToast('小人被你戳晕啦！再戳5次试试？');
+    showToast('小人被你戳晕啦！再连戳5次试试？');
     return;
   }
 
+  // 常规弹跳
   sound.playPop();
   let startT = null;
   const dur = 340;
@@ -1971,15 +2215,19 @@ avatarStage.addEventListener('click', () => {
   requestAnimationFrame(jump);
 });
 
-avatarStage.addEventListener('touchstart', () => {
-  longPressTimer = setTimeout(() => {
-    sound.playMagic();
-    eggState.isHeart = true;
-    pokeTipText.textContent = '摸摸头，今天被爱着呢～';
-    renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey);
-    showToast('触发摸摸头心动彩蛋！');
-    confetti({ particleCount: 30, spread: 50, origin: { y: 0.65 }, colors: ['#ff4757', '#ff6b81'] });
-  }, 600);
+// 长按摸摸头心动爱心雨彩蛋
+function triggerHeartEgg() {
+  sound.playMagic();
+  eggState.isHeart = true;
+  pokeTipText.textContent = '摸摸头，今天被爱着呢～';
+  spawnSvgFx('heart', 18);
+  triggerEggBanner('触发摸摸头心动彩蛋！');
+  renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey);
+  showToast('触发摸摸头心动彩蛋！');
+}
+
+avatarStage.addEventListener('touchstart', (e) => {
+  longPressTimer = setTimeout(triggerHeartEgg, 550);
 }, { passive: true });
 
 avatarStage.addEventListener('touchend', () => {
@@ -1987,14 +2235,7 @@ avatarStage.addEventListener('touchend', () => {
 });
 
 avatarStage.addEventListener('mousedown', () => {
-  longPressTimer = setTimeout(() => {
-    sound.playMagic();
-    eggState.isHeart = true;
-    pokeTipText.textContent = '摸摸头，今天被爱着呢～';
-    renderDoodleAvatar(avatarCanvas, currentSeed, currentMoodKey);
-    showToast('触发摸摸头心动彩蛋！');
-    confetti({ particleCount: 30, spread: 50, origin: { y: 0.65 }, colors: ['#ff4757', '#ff6b81'] });
-  }, 600);
+  longPressTimer = setTimeout(triggerHeartEgg, 550);
 });
 
 avatarStage.addEventListener('mouseup', () => {
@@ -2002,7 +2243,7 @@ avatarStage.addEventListener('mouseup', () => {
 });
 
 /* ─────────────────────────────────────────────────────────────
-   10. 朋友圈 / 小红书 一键分享系统
+   11. 朋友圈 / 小红书 一键分享系统
    ───────────────────────────────────────────────────────────── */
 const isWeChat = /MicroMessenger/i.test(navigator.userAgent);
 
@@ -2058,8 +2299,8 @@ btnXhsDirectShare.addEventListener('click', () => {
 
   const xhsText = 
 `今日精神状态鉴定完毕！
-[情绪物种] ${moodData.persona.replace(/.*：/, '')}
-[状态标签] ${moodData.tag}
+[情绪物种] ${personaText.textContent.replace(/.*：/, '')}
+[状态标签] ${tagText.textContent}
 [今日心声] “${quoteText.textContent.replace(/[“”]/g, '')}”
 [今日宜] ${fortuneDo.textContent}
 [今日忌] ${fortuneDont.textContent}
@@ -2084,7 +2325,7 @@ btnCloseWechatMask.addEventListener('click', () => wechatMask.classList.remove('
 btnCloseXhsMask.addEventListener('click', () => xhsMask.classList.remove('active'));
 
 /* ─────────────────────────────────────────────────────────────
-   11. 其他常规交互 (盲盒抽卡 / 底纹 / 色调 / 输入)
+   12. 其他常规交互 (盲盒抽卡 / 底纹 / 色调 / 输入)
    ───────────────────────────────────────────────────────────── */
 userInput.addEventListener('input', () => {
   const val = userInput.value.trim();
@@ -2097,6 +2338,7 @@ moodTabs.forEach(tab => {
     eggState.isDizzy = false;
     eggState.isHeart = false;
     pokeTipText.textContent = '戳戳我有彩蛋';
+    moodCard.classList.remove('shake-dizzy');
     const mood = tab.dataset.mood;
     const base = userInput.value.trim() || 'mood';
     updateAppCard(`${base}-${mood}-${Math.random()}`, mood);
@@ -2118,6 +2360,7 @@ themeCircles.forEach(circle => {
     sound.playPop();
     document.documentElement.removeAttribute('data-egg');
     eggState.isKoi = false;
+    moodCard.classList.remove('koi-golden-pulse');
     themeCircles.forEach(c => c.classList.remove('active'));
     circle.classList.add('active');
 
@@ -2139,6 +2382,7 @@ btnRandom.addEventListener('click', () => {
   eggState.isKoi = false;
   eggState.isHeart = false;
   document.documentElement.removeAttribute('data-egg');
+  moodCard.classList.remove('shake-dizzy', 'koi-golden-pulse');
   pokeTipText.textContent = '戳戳我有彩蛋';
 
   const randNum = Math.floor(Math.random() * 1e8);
