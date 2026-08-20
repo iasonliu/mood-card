@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>MoodHand 情绪手账 · 测测你的今日精神状态</title>
 <meta name="description" content="每日手绘情绪手账生成器，一键测定精神状态、能量电量与今日宜忌，生成独一无二的手绘小人与场景卡片！">
 
@@ -24,7 +24,7 @@
 
 <style>
   /* ─────────────────────────────────────────────────────────────
-     1. 设计令牌契约体系 (VideoHand Design Token & Themes)
+     1. 设计令牌契约体系 (VideoHand Design Tokens)
      ───────────────────────────────────────────────────────────── */
   :root, html[data-theme="pine"], body[data-theme="pine"] {
     --hw-paper: #FFFFFC;
@@ -41,7 +41,7 @@
     --hw-tape: rgba(220, 205, 155, 0.72);
     --hw-do: #2E7D32;
     --hw-dont: #C62828;
-    --card-shadow: 6px 8px 0px var(--hw-ink);
+    --card-shadow: 4px 5px 0px var(--hw-ink);
   }
 
   html[data-theme="terracotta"], body[data-theme="terracotta"] {
@@ -59,7 +59,7 @@
     --hw-tape: rgba(230, 195, 175, 0.72);
     --hw-do: #2E7D32;
     --hw-dont: #C62828;
-    --card-shadow: 6px 8px 0px var(--hw-ink);
+    --card-shadow: 4px 5px 0px var(--hw-ink);
   }
 
   html[data-theme="indigo"], body[data-theme="indigo"] {
@@ -77,7 +77,7 @@
     --hw-tape: rgba(190, 205, 230, 0.72);
     --hw-do: #1E6B7B;
     --hw-dont: #D14949;
-    --card-shadow: 6px 8px 0px var(--hw-ink);
+    --card-shadow: 4px 5px 0px var(--hw-ink);
   }
 
   html[data-theme="sunset"], body[data-theme="sunset"] {
@@ -95,7 +95,7 @@
     --hw-tape: rgba(240, 200, 175, 0.72);
     --hw-do: #2E7D32;
     --hw-dont: #C93B3B;
-    --card-shadow: 6px 8px 0px var(--hw-ink);
+    --card-shadow: 4px 5px 0px var(--hw-ink);
   }
 
   html[data-theme="lavender"], body[data-theme="lavender"] {
@@ -113,17 +113,16 @@
     --hw-tape: rgba(215, 195, 230, 0.72);
     --hw-do: #2E7D32;
     --hw-dont: #BF4372;
-    --card-shadow: 6px 8px 0px var(--hw-ink);
+    --card-shadow: 4px 5px 0px var(--hw-ink);
   }
 
-  /* 彩蛋金色锦鲤专属主题 */
   html[data-egg="koi"] {
     --hw-card-bg: #FFFDF0 !important;
     --hw-accent: #E5A93B !important;
     --hw-accent-ink: #B87C14 !important;
     --hw-accent-bg: rgba(229, 169, 59, 0.22) !important;
     --hw-stamp: #E5A93B !important;
-    --card-shadow: 0 0 25px rgba(229, 169, 59, 0.65), 6px 8px 0px #3D2B12 !important;
+    --card-shadow: 0 0 18px rgba(229, 169, 59, 0.6), 4px 5px 0px #3D2B12 !important;
   }
 
   * { 
@@ -134,26 +133,30 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /* ─────────────────────────────────────────────────────────────
+     2. 手机端一屏流容器布局 (100dvh Single Screen)
+     ───────────────────────────────────────────────────────────── */
   body {
-    min-height: 100vh;
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
     background-color: var(--hw-paper-tint);
     background-image: radial-gradient(circle, var(--hw-ink-subtle) 1.2px, transparent 1.2px);
-    background-size: 26px 26px;
+    background-size: 24px 24px;
     color: var(--hw-ink);
     font-family: 'Patrick Hand', 'ZCOOL KuaiLe', cursive, sans-serif;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    padding: 16px 14px 60px;
+    padding: 8px 10px 10px;
     transition: background-color 0.3s ease, color 0.3s ease;
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
+    overflow: hidden;
     perspective: 1200px;
   }
 
-  /* ─────────────────────────────────────────────────────────────
-     2. 全屏特效层与动画系统 (Egg FX Layer)
-     ───────────────────────────────────────────────────────────── */
+  /* 全屏特效层 */
   .fx-overlay {
     position: fixed;
     inset: 0;
@@ -169,18 +172,9 @@
   }
 
   @keyframes floatUpAndFade {
-    0% {
-      opacity: 0;
-      transform: translate3d(0, 0, 0) scale(0.4) rotate(0deg);
-    }
-    15% {
-      opacity: 1;
-      transform: translate3d(var(--dx1), -30px, 0) scale(1.15) rotate(var(--rot1));
-    }
-    100% {
-      opacity: 0;
-      transform: translate3d(var(--dx2), -180px, 0) scale(0.8) rotate(var(--rot2));
-    }
+    0% { opacity: 0; transform: translate3d(0, 0, 0) scale(0.4) rotate(0deg); }
+    15% { opacity: 1; transform: translate3d(var(--dx1), -30px, 0) scale(1.15) rotate(var(--rot1)); }
+    100% { opacity: 0; transform: translate3d(var(--dx2), -180px, 0) scale(0.8) rotate(var(--rot2)); }
   }
 
   .shake-dizzy {
@@ -199,26 +193,26 @@
   }
 
   @keyframes goldenPulse {
-    0% { filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5)); transform: scale(1); }
-    100% { filter: drop-shadow(0 0 24px rgba(255, 215, 0, 0.95)); transform: scale(1.02); }
+    0% { filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.5)); transform: scale(1); }
+    100% { filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.95)); transform: scale(1.01); }
   }
 
   .egg-banner {
     position: absolute;
-    top: -45px;
+    top: -40px;
     left: 50%;
     transform: translateX(-50%) scale(0.9);
     background: #FFD700;
     color: #4A3000;
     border: 2px solid #4A3000;
-    padding: 6px 16px;
+    padding: 4px 14px;
     border-radius: 20px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: bold;
-    box-shadow: 2px 4px 0 #4A3000;
+    box-shadow: 2px 3px 0 #4A3000;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     opacity: 0;
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     pointer-events: none;
@@ -227,342 +221,78 @@
   }
 
   .egg-banner.show {
-    top: 6px;
+    top: 4px;
     opacity: 1;
     transform: translateX(-50%) scale(1);
   }
 
   /* ─────────────────────────────────────────────────────────────
-     3. 顶部工具栏 (语音朗读 + 陀螺仪视差 + 历史足迹 + 音效)
+     3. 紧凑顶部导航栏 (App Header & Top Actions in 1 Row)
      ───────────────────────────────────────────────────────────── */
-  .top-toolbar {
+  .top-compact-bar {
     width: 100%;
-    max-width: 440px;
+    max-width: 400px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
+    height: 32px;
+    flex-shrink: 0;
+    padding: 0 4px;
+  }
+
+  .brand-title-wrap {
+    display: flex;
+    align-items: center;
     gap: 6px;
   }
 
-  .tool-group {
+  .brand-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--hw-ink);
     display: flex;
-    gap: 6px;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .tool-actions-row {
+    display: flex;
+    gap: 5px;
     align-items: center;
   }
 
-  .tool-btn {
+  .mini-tool-btn {
     background: var(--hw-paper);
-    border: 2px solid var(--hw-ink);
-    border-radius: 20px;
-    padding: 4px 10px;
-    font-size: 13px;
+    border: 1.5px solid var(--hw-ink);
+    border-radius: 14px;
+    padding: 2px 7px;
+    font-size: 11px;
     font-family: inherit;
     font-weight: bold;
     color: var(--hw-ink);
     cursor: pointer;
-    box-shadow: 2px 2px 0 var(--hw-ink);
+    box-shadow: 1.5px 1.5px 0 var(--hw-ink);
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    gap: 3px;
     transition: all 0.1s;
+    height: 24px;
   }
 
-  .tool-btn.active {
+  .mini-tool-btn.active {
     background: var(--hw-accent-bg);
     border-color: var(--hw-accent-ink);
     color: var(--hw-accent-ink);
   }
 
-  .tool-btn:active {
-    transform: translate(2px, 2px);
+  .mini-tool-btn:active {
+    transform: translate(1px, 1px);
     box-shadow: 0 0 0;
-  }
-
-  /* ─────────────────────────────────────────────────────────────
-     4. 社交引导与浮层
-     ───────────────────────────────────────────────────────────── */
-  .share-mask {
-    position: fixed;
-    inset: 0;
-    background: rgba(20, 25, 20, 0.85);
-    backdrop-filter: blur(4px);
-    z-index: 10000;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s ease;
-  }
-
-  .share-mask.active {
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .wechat-arrow {
-    position: absolute;
-    top: 20px;
-    right: 30px;
-    width: 80px;
-    height: 80px;
-    animation: bounceArrow 1s infinite alternate ease-in-out;
-  }
-
-  @keyframes bounceArrow {
-    0% { transform: translateY(0) rotate(-10deg); }
-    100% { transform: translateY(-10px) rotate(5deg); }
-  }
-
-  .share-dialog {
-    background: var(--hw-paper);
-    border: 3px solid var(--hw-ink);
-    border-radius: 20px;
-    padding: 24px 20px;
-    max-width: 360px;
-    width: 100%;
-    box-shadow: 6px 8px 0 rgba(0,0,0,0.5);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    color: var(--hw-ink);
-  }
-
-  .share-dialog h3 {
-    font-size: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  .share-dialog p {
-    font-size: 16px;
-    line-height: 1.5;
-    color: var(--hw-ink-soft);
-  }
-
-  .dialog-close-btn {
-    background: var(--hw-accent);
-    color: #fff;
-    border: 2px solid var(--hw-ink);
-    border-radius: 12px;
-    padding: 10px 0;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    font-family: inherit;
-    box-shadow: 2px 3px 0 var(--hw-ink);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-
-  .dialog-close-btn:active {
-    transform: translate(2px, 3px);
-    box-shadow: 0 0 0;
-  }
-
-  .friend-banner {
-    width: 100%;
-    max-width: 440px;
-    background: var(--hw-accent);
-    color: #fff;
-    border: 2px solid var(--hw-ink);
-    border-radius: 12px;
-    padding: 10px 14px;
-    margin-bottom: 14px;
-    box-shadow: 3px 4px 0 var(--hw-ink);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 15px;
-    animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-
-  @keyframes bounceIn {
-    0% { opacity: 0; transform: scale(0.9) translateY(-10px); }
-    100% { opacity: 1; transform: scale(1) translateY(0); }
-  }
-
-  .banner-btn {
-    background: #fff;
-    color: var(--hw-ink);
-    border: 1.5px solid var(--hw-ink);
-    border-radius: 8px;
-    padding: 4px 10px;
-    font-size: 13px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: 1px 2px 0 var(--hw-ink);
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-  }
-
-  .app-header {
-    text-align: center;
-    margin-bottom: 12px;
-    max-width: 480px;
-    width: 100%;
-  }
-
-  .brand-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 4px 14px;
-    background: var(--hw-accent-bg);
-    color: var(--hw-accent-ink);
-    border: 1.5px dashed var(--hw-accent);
-    border-radius: 20px;
-    font-size: 14px;
-    margin-bottom: 6px;
-    font-weight: 700;
-    letter-spacing: 0.3px;
-  }
-
-  .brand-pill svg {
-    width: 15px;
-    height: 15px;
-    stroke: currentColor;
-    stroke-width: 2;
-    fill: none;
-  }
-
-  .app-title {
-    font-size: 33px;
-    line-height: 1.2;
-    color: var(--hw-ink);
-    margin-bottom: 3px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-
-  .app-subtitle {
-    font-size: 15px;
-    color: var(--hw-ink-soft);
-  }
-
-  .visitor-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    margin-top: 4px;
-    font-size: 12px;
-    color: var(--hw-ink-soft);
-    background: var(--hw-paper);
-    padding: 2px 10px;
-    border: 1px dashed var(--hw-ink-subtle);
-    border-radius: 12px;
-  }
-
-  /* ─────────────────────────────────────────────────────────────
-     5. 3D 陀螺仪视差全息卡片架构
-     ───────────────────────────────────────────────────────────── */
-  .app-layout {
-    width: 100%;
-    max-width: 440px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    align-items: center;
-  }
-
-  .card-container {
-    width: 100%;
-    position: relative;
-    transform-style: preserve-3d;
-    transition: transform 0.1s ease-out;
-  }
-
-  .mood-card {
-    background: var(--hw-card-bg);
-    border: 3px solid var(--hw-card-border);
-    border-radius: 18px;
-    padding: 20px 18px 18px;
-    box-shadow: var(--card-shadow);
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    overflow: hidden;
-  }
-
-  .pattern-grid {
-    background-image: 
-      linear-gradient(var(--hw-ink-subtle) 1px, transparent 1px),
-      linear-gradient(90deg, var(--hw-ink-subtle) 1px, transparent 1px);
-    background-size: 18px 18px;
-  }
-  .pattern-dots {
-    background-image: radial-gradient(circle, var(--hw-ink-subtle) 1.2px, transparent 1.2px);
-    background-size: 16px 16px;
-  }
-  .pattern-lines {
-    background-image: linear-gradient(var(--hw-ink-subtle) 1px, transparent 1px);
-    background-size: 100% 24px;
-  }
-  .pattern-blank { background-image: none; }
-
-  .tape-strip {
-    position: absolute;
-    top: -12px;
-    width: 120px;
-    height: 26px;
-    background: var(--hw-tape);
-    border-left: 2px dashed rgba(0,0,0,0.2);
-    border-right: 2px dashed rgba(0,0,0,0.2);
-    transform: rotate(-2.5deg);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.06);
-    z-index: 10;
-    pointer-events: none;
-  }
-
-  .card-header-bar {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 8px;
-    border-bottom: 1.5px dashed var(--hw-ink-subtle);
-    margin-bottom: 8px;
-  }
-
-  .date-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 15px;
-    font-weight: bold;
-    color: var(--hw-ink);
-  }
-
-  .weather-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 3px 10px;
-    background: var(--hw-accent-bg);
-    color: var(--hw-accent-ink);
-    border: 1px solid var(--hw-accent);
-    border-radius: 14px;
-    font-size: 13px;
-    font-weight: 700;
   }
 
   .svg-icon {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     stroke: currentColor;
     stroke-width: 2;
     stroke-linecap: round;
@@ -574,22 +304,134 @@
   }
 
   /* ─────────────────────────────────────────────────────────────
-     6. 场景舞台 (扩大主体小人 + 背景场景 + 宠物伴侣)
+     4. 核心手账卡片 (紧凑比例，自适应手机屏幕高度)
      ───────────────────────────────────────────────────────────── */
+  .card-container {
+    width: 100%;
+    max-width: 390px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.1s ease-out;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 4px 0;
+  }
+
+  .mood-card {
+    background: var(--hw-card-bg);
+    border: 2.5px solid var(--hw-card-border);
+    border-radius: 14px;
+    padding: 10px 12px 8px;
+    box-shadow: var(--card-shadow);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: hidden;
+    height: 100%;
+    max-height: 480px;
+  }
+
+  .pattern-grid {
+    background-image: 
+      linear-gradient(var(--hw-ink-subtle) 1px, transparent 1px),
+      linear-gradient(90deg, var(--hw-ink-subtle) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+  .pattern-dots {
+    background-image: radial-gradient(circle, var(--hw-ink-subtle) 1.2px, transparent 1.2px);
+    background-size: 14px 14px;
+  }
+  .pattern-lines {
+    background-image: linear-gradient(var(--hw-ink-subtle) 1px, transparent 1px);
+    background-size: 100% 20px;
+  }
+  .pattern-blank { background-image: none; }
+
+  .tape-strip {
+    position: absolute;
+    top: -10px;
+    width: 90px;
+    height: 20px;
+    background: var(--hw-tape);
+    border-left: 1.5px dashed rgba(0,0,0,0.2);
+    border-right: 1.5px dashed rgba(0,0,0,0.2);
+    transform: rotate(-2.5deg);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .card-header-bar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 4px;
+    border-bottom: 1px dashed var(--hw-ink-subtle);
+    margin-bottom: 2px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+
+  .date-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: bold;
+    color: var(--hw-ink);
+  }
+
+  .weather-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 8px;
+    background: var(--hw-accent-bg);
+    color: var(--hw-accent-ink);
+    border: 1px solid var(--hw-accent);
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .persona-badge {
+    font-size: 11px;
+    color: var(--hw-accent-ink);
+    background: var(--hw-accent-bg);
+    padding: 1px 8px;
+    border-radius: 10px;
+    margin: 2px 0 3px;
+    font-weight: bold;
+    border: 1px dashed var(--hw-accent);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  /* 手绘小人与场景舞台 (紧凑高度自适应) */
   .stage-box {
     width: 100%;
-    height: 280px;
+    flex: 1;
+    min-height: 130px;
+    max-height: 185px;
     position: relative;
     cursor: pointer;
-    margin: 2px 0 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 14px;
+    border-radius: 10px;
     background: radial-gradient(circle, var(--hw-accent-bg) 0%, transparent 80%);
-    transition: transform 0.15s;
     user-select: none;
     -webkit-user-select: none;
+    margin: 1px 0;
   }
 
   .stage-box:hover .poke-badge {
@@ -600,79 +442,66 @@
   .poke-badge {
     position: absolute;
     bottom: 2px;
-    font-size: 12px;
+    font-size: 10px;
     background: var(--hw-ink);
     color: var(--hw-paper);
-    padding: 2px 9px;
-    border-radius: 12px;
+    padding: 1px 7px;
+    border-radius: 10px;
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(3px);
     transition: all 0.2s;
     pointer-events: none;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
   }
 
   canvas.doodle-canvas {
     width: 100%;
     height: 100%;
     display: block;
-  }
-
-  .persona-badge {
-    font-size: 13px;
-    color: var(--hw-accent-ink);
-    background: var(--hw-accent-bg);
-    padding: 2px 10px;
-    border-radius: 12px;
-    margin-bottom: 6px;
-    font-weight: bold;
-    border: 1px dashed var(--hw-accent);
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
+    object-fit: contain;
   }
 
   .tag-capsule {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 5px 18px;
-    border: 2.5px solid var(--hw-ink);
-    border-radius: 24px;
-    font-size: 20px;
+    gap: 5px;
+    padding: 2px 12px;
+    border: 2px solid var(--hw-ink);
+    border-radius: 18px;
+    font-size: 15px;
     font-weight: bold;
     background: var(--hw-paper);
-    box-shadow: 2px 3px 0 var(--hw-ink);
+    box-shadow: 1.5px 2px 0 var(--hw-ink);
     color: var(--hw-ink);
-    margin-bottom: 8px;
+    margin: 2px 0;
+    flex-shrink: 0;
   }
 
   .quote-box {
     width: 100%;
-    padding: 4px 8px;
+    padding: 2px 4px;
     text-align: center;
-    min-height: 56px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin-bottom: 8px;
-    position: relative;
+    margin: 2px 0;
+    flex-shrink: 0;
   }
 
   .quote-phrase {
-    font-size: 18px;
-    line-height: 1.45;
+    font-size: 14px;
+    line-height: 1.35;
     color: var(--hw-ink);
     font-weight: 600;
   }
 
   .quote-author-source {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--hw-ink-soft);
-    margin-top: 3px;
+    margin-top: 1px;
     font-style: italic;
   }
 
@@ -680,59 +509,64 @@
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 10px;
+    gap: 6px;
+    margin: 3px 0;
+    flex-shrink: 0;
   }
 
   .fortune-box {
     background: var(--hw-paper);
-    border: 2px solid var(--hw-ink);
-    border-radius: 10px;
-    padding: 6px 10px;
+    border: 1.5px solid var(--hw-ink);
+    border-radius: 8px;
+    padding: 3px 6px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    box-shadow: 2px 2px 0 var(--hw-ink);
+    gap: 1px;
+    box-shadow: 1.5px 1.5px 0 var(--hw-ink);
   }
 
-  .fortune-box.do-box { border-left: 5px solid var(--hw-do); }
-  .fortune-box.dont-box { border-left: 5px solid var(--hw-dont); }
+  .fortune-box.do-box { border-left: 4px solid var(--hw-do); }
+  .fortune-box.dont-box { border-left: 4px solid var(--hw-dont); }
 
   .fortune-head {
-    font-size: 12px;
+    font-size: 10px;
     font-weight: bold;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
   }
   .fortune-head.do-text { color: var(--hw-do); }
   .fortune-head.dont-text { color: var(--hw-dont); }
 
   .fortune-content {
-    font-size: 13px;
+    font-size: 11px;
     font-weight: bold;
     color: var(--hw-ink);
-    line-height: 1.3;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .energy-widget {
     width: 100%;
     background: var(--hw-paper);
-    border: 2px solid var(--hw-ink);
-    border-radius: 10px;
-    padding: 7px 12px;
-    margin-bottom: 8px;
+    border: 1.5px solid var(--hw-ink);
+    border-radius: 8px;
+    padding: 4px 8px;
+    margin: 2px 0 4px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    box-shadow: 2px 2px 0 var(--hw-ink);
+    gap: 2px;
+    box-shadow: 1.5px 1.5px 0 var(--hw-ink);
+    flex-shrink: 0;
   }
 
   .energy-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 13px;
+    font-size: 11px;
     font-weight: bold;
     color: var(--hw-ink-soft);
   }
@@ -740,15 +574,15 @@
   .energy-header-left {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
   }
 
   .energy-track {
     width: 100%;
-    height: 11px;
+    height: 8px;
     background: var(--hw-paper-tint);
-    border: 1.5px solid var(--hw-ink);
-    border-radius: 6px;
+    border: 1px solid var(--hw-ink);
+    border-radius: 4px;
     overflow: hidden;
     position: relative;
   }
@@ -758,19 +592,12 @@
     background: repeating-linear-gradient(
       -45deg,
       var(--hw-accent),
-      var(--hw-accent) 6px,
-      var(--hw-accent-ink) 6px,
-      var(--hw-accent-ink) 12px
+      var(--hw-accent) 5px,
+      var(--hw-accent-ink) 5px,
+      var(--hw-accent-ink) 10px
     );
-    border-right: 1.5px solid var(--hw-ink);
+    border-right: 1px solid var(--hw-ink);
     transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  canvas.wave-bar {
-    width: 100%;
-    height: 12px;
-    display: block;
-    margin-bottom: 6px;
   }
 
   .card-bottom-bar {
@@ -778,41 +605,42 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    padding-top: 6px;
+    padding-top: 3px;
     border-top: 1px dashed var(--hw-ink-subtle);
+    flex-shrink: 0;
   }
 
   .author-meta {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 1px;
   }
 
   .author-sig {
-    font-size: 16px;
+    font-size: 13px;
     font-weight: bold;
     color: var(--hw-ink);
   }
 
   .card-hint-sub {
-    font-size: 11px;
+    font-size: 9px;
     color: var(--hw-ink-soft);
   }
 
   .qr-stamp-box {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     background: var(--hw-paper);
-    border: 1.5px solid var(--hw-ink);
-    padding: 3px 6px;
-    border-radius: 8px;
-    box-shadow: 1px 2px 0 var(--hw-ink);
+    border: 1px solid var(--hw-ink);
+    padding: 2px 4px;
+    border-radius: 6px;
+    box-shadow: 1px 1px 0 var(--hw-ink);
   }
 
   .qr-code-img {
-    width: 38px;
-    height: 38px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -826,143 +654,78 @@
   .qr-text {
     display: flex;
     flex-direction: column;
-    font-size: 9px;
-    line-height: 1.2;
+    font-size: 8px;
+    line-height: 1.1;
     color: var(--hw-ink);
     font-weight: bold;
     text-align: left;
   }
 
   /* ─────────────────────────────────────────────────────────────
-     7. 控制操作面板
+     5. 紧凑底部操作面板 (All Controls in 1 Screen Flow)
      ───────────────────────────────────────────────────────────── */
   .ctrl-panel {
     width: 100%;
+    max-width: 390px;
     background: var(--hw-paper);
-    border: 2.5px solid var(--hw-ink);
-    border-radius: 16px;
-    padding: 16px 14px;
-    box-shadow: 4px 5px 0 var(--hw-ink);
+    border: 2px solid var(--hw-ink);
+    border-radius: 12px;
+    padding: 8px 10px 8px;
+    box-shadow: 3px 4px 0 var(--hw-ink);
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  /* 输入框与底纹/主题微选器同排 */
+  .input-theme-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    width: 100%;
   }
 
   .input-wrapper {
     position: relative;
-    width: 100%;
+    flex: 1;
     display: flex;
     align-items: center;
   }
 
   .input-icon {
     position: absolute;
-    left: 12px;
-    width: 18px;
-    height: 18px;
+    left: 8px;
+    width: 14px;
+    height: 14px;
     color: var(--hw-ink-soft);
     pointer-events: none;
   }
 
   .sketch-input {
     width: 100%;
-    height: 46px;
-    padding: 0 14px 0 38px;
+    height: 32px;
+    padding: 0 10px 0 28px;
     font-family: inherit;
-    font-size: 16px;
+    font-size: 13px;
     background: var(--hw-paper-tint);
-    border: 2px solid var(--hw-ink);
-    border-radius: 10px;
+    border: 1.5px solid var(--hw-ink);
+    border-radius: 8px;
     outline: none;
     color: var(--hw-ink);
   }
 
-  .sketch-input:focus {
-    border-color: var(--hw-accent);
-    background: #fff;
-  }
-
-  .panel-section-title {
-    font-size: 14px;
-    color: var(--hw-ink-soft);
-    margin-bottom: 6px;
-    font-weight: bold;
+  .theme-mini-row {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .mood-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-  }
-
-  .mood-tab {
-    background: var(--hw-paper-tint);
-    border: 2px solid var(--hw-ink);
-    padding: 7px 4px;
-    border-radius: 10px;
-    font-family: inherit;
-    font-size: 15px;
-    color: var(--hw-ink);
-    cursor: pointer;
-    box-shadow: 2px 2px 0 var(--hw-ink);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    transition: all 0.1s ease;
-  }
-
-  .mood-tab:active, .mood-tab.active {
-    transform: translate(2px, 2px);
-    box-shadow: 0 0 0;
-    background: var(--hw-accent-bg);
-    border-color: var(--hw-accent-ink);
-    color: var(--hw-accent-ink);
-    font-weight: bold;
-  }
-
-  .custom-options-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .pill-selector, .theme-selector {
-    display: flex;
-    gap: 5px;
-    align-items: center;
-  }
-
-  .option-btn {
-    padding: 4px 8px;
-    font-size: 12px;
-    border: 1.5px solid var(--hw-ink);
-    border-radius: 6px;
-    background: var(--hw-paper-tint);
-    cursor: pointer;
-    font-family: inherit;
-    color: var(--hw-ink);
-    font-weight: bold;
-    display: inline-flex;
-    align-items: center;
     gap: 4px;
-  }
-
-  .option-btn.active {
-    background: var(--hw-ink);
-    color: var(--hw-paper);
+    align-items: center;
   }
 
   .theme-circle {
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    border: 2px solid var(--hw-ink);
+    border: 1.5px solid var(--hw-ink);
     cursor: pointer;
     box-shadow: 1px 1px 0 var(--hw-ink);
     position: relative;
@@ -976,85 +739,100 @@
     border-radius: 50%;
   }
 
-  .share-direct-grid {
+  /* 6 个心情紧凑按钮网格 */
+  .mood-compact-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+    width: 100%;
   }
 
-  .share-action-btn {
-    height: 48px;
+  .mood-tab {
+    background: var(--hw-paper-tint);
+    border: 1.5px solid var(--hw-ink);
+    padding: 4px 1px;
+    border-radius: 8px;
     font-family: inherit;
-    font-size: 16px;
+    font-size: 11px;
+    color: var(--hw-ink);
+    cursor: pointer;
+    box-shadow: 1px 1.5px 0 var(--hw-ink);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    transition: all 0.1s ease;
+    height: 36px;
+  }
+
+  .mood-tab .svg-icon {
+    width: 13px;
+    height: 13px;
+  }
+
+  .mood-tab.active {
+    transform: translate(1px, 1px);
+    box-shadow: 0 0 0;
+    background: var(--hw-accent-bg);
+    border-color: var(--hw-accent-ink);
+    color: var(--hw-accent-ink);
     font-weight: bold;
-    border: 2.5px solid var(--hw-ink);
-    border-radius: 12px;
-    box-shadow: 3px 4px 0 var(--hw-ink);
+  }
+
+  /* 4 个核心动作按钮 */
+  .action-deck-row {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr 1.15fr 1fr;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .action-btn {
+    height: 35px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: bold;
+    border: 2px solid var(--hw-ink);
+    border-radius: 8px;
+    box-shadow: 2px 2.5px 0 var(--hw-ink);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 4px;
     transition: all 0.1s;
     color: #fff;
+    white-space: nowrap;
+    padding: 0 4px;
   }
 
-  .share-action-btn:active {
-    transform: translate(3px, 4px);
+  .action-btn:active {
+    transform: translate(2px, 2.5px);
     box-shadow: 0 0 0;
   }
 
-  .btn-wechat {
-    background: #07C160;
-    border-color: #058843;
-  }
-
-  .btn-xiaohongshu {
-    background: #FF2442;
-    border-color: #C20D26;
-  }
-
-  .sub-action-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-
-  .sub-btn {
-    height: 44px;
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: bold;
-    background: var(--hw-paper);
-    border: 2px solid var(--hw-ink);
-    border-radius: 10px;
-    box-shadow: 2px 3px 0 var(--hw-ink);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    color: var(--hw-ink);
-    transition: all 0.1s;
-  }
-
-  .sub-btn:active {
-    transform: translate(2px, 3px);
-    box-shadow: 0 0 0;
-  }
-
-  .btn-blindbox {
+  .btn-random-pill {
     background: #FFE082;
     color: #4E342E;
   }
 
-  .footer-tip {
-    font-size: 12px;
-    color: var(--hw-ink-soft);
-    text-align: center;
-    line-height: 1.4;
+  .btn-wechat-pill {
+    background: #07C160;
+    border-color: #058843;
   }
 
+  .btn-xhs-pill {
+    background: #FF2442;
+    border-color: #C20D26;
+  }
+
+  .btn-save-pill {
+    background: var(--hw-ink);
+    color: var(--hw-paper);
+  }
+
+  /* 抽屉与弹窗 */
   .history-drawer {
     position: fixed;
     inset: 0;
@@ -1075,16 +853,16 @@
 
   .drawer-content {
     width: 100%;
-    max-width: 500px;
+    max-width: 440px;
     margin: 0 auto;
     background: var(--hw-paper);
     border-top: 3px solid var(--hw-ink);
     border-radius: 20px 20px 0 0;
-    padding: 20px 16px 30px;
+    padding: 16px 14px 24px;
     max-height: 75vh;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     box-shadow: 0 -4px 20px rgba(0,0,0,0.25);
     transform: translateY(100%);
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -1099,11 +877,11 @@
     justify-content: space-between;
     align-items: center;
     border-bottom: 2px dashed var(--hw-ink-subtle);
-    padding-bottom: 10px;
+    padding-bottom: 8px;
   }
 
   .drawer-header h3 {
-    font-size: 20px;
+    font-size: 18px;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -1113,46 +891,128 @@
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding-right: 4px;
+    gap: 6px;
+    padding-right: 2px;
   }
 
   .history-item {
     background: var(--hw-paper-tint);
     border: 1.5px solid var(--hw-ink);
-    border-radius: 10px;
-    padding: 8px 12px;
+    border-radius: 8px;
+    padding: 6px 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    box-shadow: 2px 2px 0 var(--hw-ink);
+    box-shadow: 1.5px 1.5px 0 var(--hw-ink);
   }
 
   .toast-box {
     position: fixed;
-    top: 20px;
+    top: 15px;
     left: 50%;
-    transform: translateX(-50%) translateY(-70px);
+    transform: translateX(-50%) translateY(-60px);
     background: var(--hw-ink);
     color: var(--hw-paper);
-    padding: 9px 20px;
-    border-radius: 24px;
-    font-size: 15px;
+    padding: 7px 16px;
+    border-radius: 20px;
+    font-size: 13px;
     font-weight: bold;
-    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.25);
     opacity: 0;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 99999;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     pointer-events: none;
   }
 
   .toast-box.show {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
+  }
+
+  /* 微信与小红书分享蒙层 */
+  .share-mask {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 25, 20, 0.85);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .share-mask.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .wechat-arrow {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    animation: bounceArrow 1s infinite alternate ease-in-out;
+  }
+
+  @keyframes bounceArrow {
+    0% { transform: translateY(0) rotate(-10deg); }
+    100% { transform: translateY(-8px) rotate(5deg); }
+  }
+
+  .share-dialog {
+    background: var(--hw-paper);
+    border: 2.5px solid var(--hw-ink);
+    border-radius: 16px;
+    padding: 20px 16px;
+    max-width: 320px;
+    width: 100%;
+    box-shadow: 5px 6px 0 rgba(0,0,0,0.5);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    color: var(--hw-ink);
+  }
+
+  .share-dialog h3 {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .share-dialog p {
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--hw-ink-soft);
+  }
+
+  .dialog-close-btn {
+    background: var(--hw-accent);
+    color: #fff;
+    border: 2px solid var(--hw-ink);
+    border-radius: 10px;
+    padding: 8px 0;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 2px 2px 0 var(--hw-ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
   }
 </style>
 </head>
@@ -1176,7 +1036,7 @@
     </svg>
     <div class="share-dialog">
       <h3>
-        <svg class="svg-icon" style="color:#07C160;width:22px;height:22px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
+        <svg class="svg-icon" style="color:#07C160;width:20px;height:20px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></svg>
         <span>微信一键分享</span>
       </h3>
       <p>点击右上角 <b>「···」</b><br>即可将今日手绘卡片 <b>「分享到朋友圈」</b> 或 <b>「发送给好友」</b>！</p>
@@ -1191,16 +1051,16 @@
   <div class="share-mask" id="xhs-mask">
     <div class="share-dialog">
       <h3 style="color:#FF2442;">
-        <svg class="svg-icon" style="color:#FF2442;width:22px;height:22px;" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 12h8M12 8v8"/></svg>
+        <svg class="svg-icon" style="color:#FF2442;width:20px;height:20px;" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 12h8M12 8v8"/></svg>
         <span>小红书一键发布</span>
       </h3>
       <p>已为你生成 <b>3:4 小红书专属尺寸卡片</b>！<br>长按保存图片或直接唤起发布笔记～</p>
-      <div id="xhs-preview-box" style="width:100%;max-height:180px;overflow:hidden;border-radius:8px;border:1.5px dashed #FF2442;display:flex;align-items:center;justify-content:center;background:#fafafa;">
-        <span style="font-size:12px;color:#888;">卡片渲染中...</span>
+      <div id="xhs-preview-box" style="width:100%;max-height:140px;overflow:hidden;border-radius:6px;border:1.5px dashed #FF2442;display:flex;align-items:center;justify-content:center;background:#fafafa;">
+        <span style="font-size:11px;color:#888;">卡片渲染中...</span>
       </div>
       <button class="dialog-close-btn" style="background:#FF2442;" id="btn-xhs-direct-share">
         <svg class="svg-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        <span>保存卡片并复制爆款标签</span>
+        <span>保存并复制爆款标签</span>
       </button>
       <button class="dialog-close-btn" style="background:#eee;color:#333;border-color:#ccc;box-shadow:none;" id="btn-close-xhs-mask">返回</button>
     </div>
@@ -1214,284 +1074,209 @@
           <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
           <span>历史心情足迹</span>
         </h3>
-        <button class="tool-btn" id="btn-close-history">关闭</button>
+        <button class="mini-tool-btn" id="btn-close-history">关闭</button>
       </div>
-      <div class="drawer-list" id="history-list">
-        <!-- 动态历史列表 -->
-      </div>
+      <div class="drawer-list" id="history-list"></div>
     </div>
   </div>
 
-  <!-- 顶部前沿工具条 (语音念白 + 3D陀螺仪视差 + 历史足迹 + 音效开关) -->
-  <div class="top-toolbar">
-    <div class="tool-group">
-      <button class="tool-btn" id="btn-history-toggle">
-        <svg class="svg-icon" style="width:14px;height:14px;" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+  <!-- 1. 紧凑顶部导航栏 (标题 + 快捷操作同排) -->
+  <header class="top-compact-bar">
+    <div class="brand-title-wrap">
+      <div class="brand-title">
+        <svg class="svg-icon" style="width:18px;height:18px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+        <span>MoodHand 情绪手账</span>
+      </div>
+    </div>
+
+    <div class="tool-actions-row">
+      <button class="mini-tool-btn" id="btn-history-toggle" title="历史心情足迹">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
         <span>足迹</span>
       </button>
-      <button class="tool-btn" id="btn-speech-read" title="Web Speech API 治愈念白">
-        <svg class="svg-icon" id="speech-icon" style="width:14px;height:14px;" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+      <button class="mini-tool-btn" id="btn-speech-read" title="Web Speech 语音念白">
+        <svg class="svg-icon" id="speech-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
         <span id="speech-text">读卡</span>
       </button>
-      <button class="tool-btn" id="btn-gyro-toggle" title="3D 陀螺仪视差感知">
-        <svg class="svg-icon" style="width:14px;height:14px;" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-        <span id="gyro-text">3D视差</span>
+      <button class="mini-tool-btn" id="btn-gyro-toggle" title="3D 陀螺仪视差">
+        <svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <span id="gyro-text">3D</span>
       </button>
-    </div>
-
-    <div class="tool-group">
-      <button class="tool-btn" id="btn-sound-toggle">
-        <svg class="svg-icon" id="sound-icon" style="width:14px;height:14px;" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-        <span id="sound-label">音效 开</span>
+      <button class="mini-tool-btn" id="btn-sound-toggle" title="音效开关">
+        <svg class="svg-icon" id="sound-icon" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
       </button>
-    </div>
-  </div>
-
-  <!-- 好友分享识别横幅 -->
-  <div class="friend-banner" id="friend-banner" style="display: none;">
-    <div style="display: flex; align-items: center; gap: 6px;">
-      <svg class="svg-icon" viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-      <span id="friend-banner-text">你正在查看好友的今日手绘心情！</span>
-    </div>
-    <button class="banner-btn" id="btn-make-my-own">
-      <span>我也测一个</span>
-      <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-    </button>
-  </div>
-
-  <!-- 头部品牌 -->
-  <header class="app-header">
-    <div class="brand-pill">
-      <svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-      <span>MoodHand Visual System 3.0</span>
-    </div>
-    <h1 class="app-title">
-      <svg class="svg-icon" style="width:30px;height:30px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-      <span>今日精神状态诊断书</span>
-    </h1>
-    <p class="app-subtitle">手绘小人 · 场景宠物 · 文艺热梗 · 3D视差与语音念白</p>
-    <div class="visitor-pill" id="visitor-badge">
-      <svg class="svg-icon" style="width:13px;height:13px;" viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-      <span>今日已有 <b id="random-visitor-count">3,128</b> 位漫游者领取心情</span>
     </div>
   </header>
 
-  <!-- 主体卡片区域 (支持 3D 视差倾斜) -->
-  <main class="app-layout">
-    
-    <div class="card-container" id="card-3d-wrapper">
-      <!-- 彩蛋横幅 -->
-      <div class="egg-banner" id="egg-banner">
-        <svg class="svg-icon" style="width:16px;height:16px;" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        <span id="egg-banner-text">已解锁隐藏彩蛋！</span>
-      </div>
-
-      <article class="mood-card pattern-grid" id="mood-card">
-        <div class="tape-strip"></div>
-
-        <!-- 顶部信息栏 -->
-        <div class="card-header-bar">
-          <div class="date-badge">
-            <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <span id="date-display">2026.08.19</span>
-          </div>
-          <div class="weather-pill" id="weather-display">
-            <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-            <span id="weather-text">微风拂面</span>
-          </div>
-        </div>
-
-        <!-- 情绪人格物种称号 -->
-        <div class="persona-badge" id="persona-badge">
-          <svg class="svg-icon" style="width:14px;height:14px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
-          <span id="persona-text">情绪物种：卡皮巴拉式稳定发疯</span>
-        </div>
-
-        <!-- 场景舞台 (小人主体加大 + 场景环境 + 宠物伴侣 + 连戳彩蛋) -->
-        <div class="stage-box" id="avatar-stage" title="戳戳我，长按有心动爱心！">
-          <canvas class="doodle-canvas" id="avatarCanvas" width="600" height="560"></canvas>
-          <div class="poke-badge" id="stage-badge">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
-            <span id="poke-tip-text">戳戳我有彩蛋</span>
-          </div>
-        </div>
-
-        <!-- 情绪标签胶囊 -->
-        <div class="tag-capsule" id="tag-capsule">
-          <span id="tag-icon-wrap"></span>
-          <span id="tag-text">快乐放空中</span>
-        </div>
-
-        <!-- 治愈手写金句与网络热梗/哲学出处 -->
-        <div class="quote-box">
-          <p class="quote-phrase" id="quote-text">“在隆冬，我终于知道，我身上有一个不可战胜的夏天。”</p>
-          <div class="quote-author-source" id="quote-source">— 阿尔贝·加缪《夏天集》</div>
-        </div>
-
-        <!-- 今日宜忌手账标签 -->
-        <div class="fortune-row">
-          <div class="fortune-box do-box">
-            <div class="fortune-head do-text">
-              <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <span>今日宜 · DO</span>
-            </div>
-            <div class="fortune-content" id="fortune-do">喝全糖奶茶 / 准点下班</div>
-          </div>
-          <div class="fortune-box dont-box">
-            <div class="fortune-head dont-text">
-              <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-              <span>今日忌 · DON'T</span>
-            </div>
-            <div class="fortune-content" id="fortune-dont">过度内耗 / 秒回工作</div>
-          </div>
-        </div>
-
-        <!-- 状态能量仪表槽 -->
-        <div class="energy-widget">
-          <div class="energy-header">
-            <div class="energy-header-left">
-              <svg class="svg-icon" style="width:14px;height:14px;" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-              <span id="energy-title">精神能量电量</span>
-            </div>
-            <span id="energy-value">85%</span>
-          </div>
-          <div class="energy-track">
-            <div class="energy-fill" id="energy-bar" style="width: 85%;"></div>
-          </div>
-        </div>
-
-        <!-- 手绘波浪分割条 -->
-        <canvas class="wave-bar" id="waveCanvas" width="380" height="20"></canvas>
-
-        <!-- 卡片底部: 署名 + 裂变二维码 -->
-        <div class="card-bottom-bar">
-          <div class="author-meta">
-            <div class="author-sig" id="author-sig">— @匿名漫游者</div>
-            <div class="card-hint-sub">MoodHand 手账 · 每日心境记录</div>
-          </div>
-          
-          <!-- 裂变二维码 -->
-          <div class="qr-stamp-box" title="扫码生成同款手账">
-            <div class="qr-code-img" id="card-qrcode"></div>
-            <div class="qr-text">
-              <span>长按/扫码</span>
-              <span>测你的心情</span>
-            </div>
-          </div>
-        </div>
-
-      </article>
+  <!-- 2. 核心手账卡片 (紧凑优雅中景) -->
+  <main class="card-container" id="card-3d-wrapper">
+    <div class="egg-banner" id="egg-banner">
+      <svg class="svg-icon" style="width:14px;height:14px;" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span id="egg-banner-text">已解锁隐藏彩蛋！</span>
     </div>
 
-    <!-- 用户操作面板 -->
-    <section class="ctrl-panel">
-      <!-- 文本输入 (支持猫咪/卡皮巴拉/暴富/咖啡等彩蛋词) -->
+    <article class="mood-card pattern-grid" id="mood-card">
+      <div class="tape-strip"></div>
+
+      <!-- 顶部元数据 -->
+      <div class="card-header-bar">
+        <div class="date-badge">
+          <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="date-display">2026.08.19</span>
+        </div>
+        <div class="weather-pill" id="weather-display">
+          <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <span id="weather-text">微风拂面</span>
+        </div>
+      </div>
+
+      <!-- 称号 -->
+      <div class="persona-badge" id="persona-badge">
+        <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+        <span id="persona-text">情绪物种：卡皮巴拉式稳定发疯</span>
+      </div>
+
+      <!-- 小人舞台 -->
+      <div class="stage-box" id="avatar-stage" title="戳戳我，长按有心动爱心！">
+        <canvas class="doodle-canvas" id="avatarCanvas" width="560" height="420"></canvas>
+        <div class="poke-badge" id="stage-badge">
+          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+          <span id="poke-tip-text">戳戳我有彩蛋</span>
+        </div>
+      </div>
+
+      <!-- 情绪标签 -->
+      <div class="tag-capsule" id="tag-capsule">
+        <span id="tag-icon-wrap"></span>
+        <span id="tag-text">快乐放空中</span>
+      </div>
+
+      <!-- 治愈金句 -->
+      <div class="quote-box">
+        <p class="quote-phrase" id="quote-text">“在隆冬，我终于知道，我身上有一个不可战胜的夏天。”</p>
+        <div class="quote-author-source" id="quote-source">— 阿尔贝·加缪《夏天集》</div>
+      </div>
+
+      <!-- 宜忌便签 -->
+      <div class="fortune-row">
+        <div class="fortune-box do-box">
+          <div class="fortune-head do-text">
+            <svg class="svg-icon" style="width:10px;height:10px;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>今日宜 · DO</span>
+          </div>
+          <div class="fortune-content" id="fortune-do">喝全糖奶茶 / 准点下班</div>
+        </div>
+        <div class="fortune-box dont-box">
+          <div class="fortune-head dont-text">
+            <svg class="svg-icon" style="width:10px;height:10px;" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <span>今日忌 · DON'T</span>
+          </div>
+          <div class="fortune-content" id="fortune-dont">过度内耗 / 秒回工作</div>
+        </div>
+      </div>
+
+      <!-- 能量槽 -->
+      <div class="energy-widget">
+        <div class="energy-header">
+          <div class="energy-header-left">
+            <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span id="energy-title">精神能量电量</span>
+          </div>
+          <span id="energy-value">85%</span>
+        </div>
+        <div class="energy-track">
+          <div class="energy-fill" id="energy-bar" style="width: 85%;"></div>
+        </div>
+      </div>
+
+      <!-- 底部署名与二维码 -->
+      <div class="card-bottom-bar">
+        <div class="author-meta">
+          <div class="author-sig" id="author-sig">— @匿名漫游者</div>
+          <div class="card-hint-sub">MoodHand 手账 · 每日心境记录</div>
+        </div>
+        
+        <div class="qr-stamp-box" title="扫码生成同款手账">
+          <div class="qr-code-img" id="card-qrcode"></div>
+          <div class="qr-text">
+            <span>长按/扫码</span>
+            <span>测你的心情</span>
+          </div>
+        </div>
+      </div>
+
+    </article>
+  </main>
+
+  <!-- 3. 紧凑操作面板 (1 屏全覆盖流) -->
+  <footer class="ctrl-panel">
+    <!-- 行 1: 输入框 + 主题色球 -->
+    <div class="input-theme-row">
       <div class="input-wrapper">
         <svg class="svg-icon input-icon" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        <input type="text" id="userInput" class="sketch-input" placeholder="输入昵称 (试输入'卡皮巴拉' / '猫咪' / '暴富'有彩蛋)..." maxlength="25" autocomplete="off">
+        <input type="text" id="userInput" class="sketch-input" placeholder="输入昵称 (试输入'卡皮巴拉'/'猫咪'/'暴富')..." maxlength="20" autocomplete="off">
       </div>
 
-      <!-- 情绪选择器 -->
-      <div>
-        <div class="panel-section-title">
-          <span>选择心境状态</span>
-          <span style="font-size:12px;opacity:0.75;">改变五官动作与运势</span>
-        </div>
-        <div class="mood-grid">
-          <button class="mood-tab active" data-mood="happy">
-            <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-            <span>嗨到起飞</span>
-          </button>
-          <button class="mood-tab" data-mood="chill">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
-            <span>佛系摸鱼</span>
-          </button>
-          <button class="mood-tab" data-mood="tired">
-            <svg class="svg-icon" viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11"/><line x1="6" y1="12" x2="8" y2="12"/></svg>
-            <span>电量见底</span>
-          </button>
-          <button class="mood-tab" data-mood="rage">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>
-            <span>炸毛暴走</span>
-          </button>
-          <button class="mood-tab" data-mood="curious">
-            <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            <span>脑洞大开</span>
-          </button>
-          <button class="mood-tab" data-mood="cozy">
-            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            <span>想睡大觉</span>
-          </button>
-        </div>
+      <div class="theme-mini-row">
+        <div class="theme-circle active" data-theme="pine" style="background:#003E1F;" title="松绿"></div>
+        <div class="theme-circle" data-theme="terracotta" style="background:#C4553B;" title="砖红"></div>
+        <div class="theme-circle" data-theme="indigo" style="background:#1B2845;" title="靛蓝"></div>
+        <div class="theme-circle" data-theme="sunset" style="background:#E26D46;" title="落日"></div>
+        <div class="theme-circle" data-theme="lavender" style="background:#8762A6;" title="暮紫"></div>
       </div>
+    </div>
 
-      <!-- 纸张底纹 & 色板 -->
-      <div class="custom-options-row">
-        <div>
-          <div class="panel-section-title" style="margin-bottom:3px;"><span>底纹</span></div>
-          <div class="pill-selector">
-            <button class="option-btn active" data-pattern="grid">
-              <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-              <span>方格</span>
-            </button>
-            <button class="option-btn" data-pattern="dots">
-              <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
-              <span>点阵</span>
-            </button>
-            <button class="option-btn" data-pattern="lines">
-              <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
-              <span>横线</span>
-            </button>
-            <button class="option-btn" data-pattern="blank">
-              <svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-              <span>留白</span>
-            </button>
-          </div>
-        </div>
+    <!-- 行 2: 6 个情绪极简网格 -->
+    <div class="mood-compact-grid">
+      <button class="mood-tab active" data-mood="happy">
+        <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+        <span>起飞</span>
+      </button>
+      <button class="mood-tab" data-mood="chill">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>
+        <span>摸鱼</span>
+      </button>
+      <button class="mood-tab" data-mood="tired">
+        <svg class="svg-icon" viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11"/><line x1="6" y1="12" x2="8" y2="12"/></svg>
+        <span>见底</span>
+      </button>
+      <button class="mood-tab" data-mood="rage">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>
+        <span>炸毛</span>
+      </button>
+      <button class="mood-tab" data-mood="curious">
+        <svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>脑洞</span>
+      </button>
+      <button class="mood-tab" data-mood="cozy">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <span>大觉</span>
+      </button>
+    </div>
 
-        <div>
-          <div class="panel-section-title" style="margin-bottom:3px;"><span>主题色</span></div>
-          <div class="theme-selector">
-            <div class="theme-circle active" data-theme="pine" style="background:#003E1F;" title="松绿"></div>
-            <div class="theme-circle" data-theme="terracotta" style="background:#C4553B;" title="砖红"></div>
-            <div class="theme-circle" data-theme="indigo" style="background:#1B2845;" title="靛蓝"></div>
-            <div class="theme-circle" data-theme="sunset" style="background:#E26D46;" title="落日"></div>
-            <div class="theme-circle" data-theme="lavender" style="background:#8762A6;" title="暮紫"></div>
-          </div>
-        </div>
-      </div>
+    <!-- 行 3: 4 个核心操作 (抽盲盒 / 朋友圈 / 小红书 / 保存) -->
+    <div class="action-deck-row">
+      <button class="action-btn btn-random-pill" id="btn-random">
+        <svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="16" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="8" cy="16" r="1.5"/></svg>
+        <span>抽盲盒</span>
+      </button>
 
-      <!-- 一键分享到微信朋友圈 & 小红书核心按钮 -->
-      <div class="share-direct-grid">
-        <button class="share-action-btn btn-wechat" id="btn-share-wechat">
-          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm7 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.42 3.84 7.02L5 22l4.24-2.12c.88.24 1.8.37 2.76.37 5.52 0 10-4.03 10-9s-4.48-9-10-9z"/></svg>
-          <span>一键发朋友圈</span>
-        </button>
+      <button class="action-btn btn-wechat-pill" id="btn-share-wechat">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm7 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/><path d="M12 2C6.48 2 2 6.03 2 11c0 2.87 1.5 5.42 3.84 7.02L5 22l4.24-2.12c.88.24 1.8.37 2.76.37 5.52 0 10-4.03 10-9s-4.48-9-10-9z"/></svg>
+        <span>发朋友圈</span>
+      </button>
 
-        <button class="share-action-btn btn-xiaohongshu" id="btn-share-xhs">
-          <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 12h8M12 8v8"/></svg>
-          <span>一键发小红书</span>
-        </button>
-      </div>
+      <button class="action-btn btn-xhs-pill" id="btn-share-xhs">
+        <svg class="svg-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 12h8M12 8v8"/></svg>
+        <span>发小红书</span>
+      </button>
 
-      <!-- 辅助功能：抽盲盒 & 保存拍立得 -->
-      <div class="sub-action-row">
-        <button class="sub-btn btn-blindbox" id="btn-random">
-          <svg class="svg-icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="8" cy="8" r="1.5"/><circle cx="16" cy="16" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="16" cy="8" r="1.5"/><circle cx="8" cy="16" r="1.5"/></svg>
-          <span>抽今日盲盒</span>
-        </button>
-        <button class="sub-btn" id="btn-export">
-          <svg class="svg-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          <span>保存卡片图片</span>
-        </button>
-      </div>
-
-      <div class="footer-tip">
-        小提示：连续快速戳小人 5 次或 10 次，可解锁神秘隐藏彩蛋！
-      </div>
-    </section>
-
-  </main>
+      <button class="action-btn btn-save-pill" id="btn-export">
+        <svg class="svg-icon" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        <span>保存</span>
+      </button>
+    </div>
+  </footer>
 
 <script>
 /* ─────────────────────────────────────────────────────────────
@@ -1713,9 +1498,9 @@ function getComputedThemeColors() {
 function strokePts(ctx, rng, pts, o = {}) {
   const colors = getComputedThemeColors();
   const {
-    w = 3.8,
+    w = 3.6,
     passes = 2,
-    wob = 2.2,
+    wob = 2.0,
     color = colors.ink,
     alpha = 0.94,
     close = false
@@ -1779,11 +1564,11 @@ function line(ctx, rng, x0, y0, x1, y1, o = {}) {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   6. 文艺哲学与网络热梗知识库 (Memes & Philosophy Database)
+   6. 文艺哲学与网络热梗知识库
    ───────────────────────────────────────────────────────────── */
 const SVG_ICONS = {
   happy: `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`,
-  chill: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>`,
+  chill: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>`,
   tired: `<svg class="svg-icon" viewBox="0 0 24 24"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11"/><line x1="6" y1="12" x2="8" y2="12"/></svg>`,
   rage: `<svg class="svg-icon" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/></svg>`,
   curious: `<svg class="svg-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
@@ -1807,7 +1592,7 @@ const MOOD_DATABASE = {
     pet: 'dog',
     energyTitle: '多巴胺活跃峰值',
     energyVal: 95,
-    doList: ['尊嘟假嘟都快乐 / 奖励全糖奶茶', '大步踩落叶 / 散发无敌魅力', '对镜子大笑 / 开启好运结界'],
+    doList: ['尊嘟假嘟都快乐 / 奖励奶茶', '大步踩落叶 / 散发魅力', '对镜子大笑 / 开启好运结界'],
     dontList: ['扫兴冷场 / 犹豫不决', '自我否定 / 委屈自己', '节食内疚 / 压抑欢喜'],
     quotes: [
       { text: '“在隆冬，我终于知道，我身上有一个不可战胜的夏天。”', source: '— 阿尔贝·加缪《夏天集》' },
@@ -1823,7 +1608,7 @@ const MOOD_DATABASE = {
     pet: 'capybara',
     energyTitle: '松弛感与摸鱼指数',
     energyVal: 80,
-    doList: ['准点下班 / 窗边看云发呆', '泡大麦茶 / 慢吞吞散步', '把任务推到明天 / 保持微笑'],
+    doList: ['准点下班 / 窗边发呆', '泡大麦茶 / 慢吞吞散步', '把任务推到明天 / 保持微笑'],
     dontList: ['秒回工作 / 瞎操心', '过度内耗 / 逞强硬扛', '卷生卷死 / 焦虑失眠'],
     quotes: [
       { text: '“只要我躺得够平，生活的镰刀就割不到我。”', source: '— 卡皮巴拉松弛哲学' },
@@ -1842,7 +1627,7 @@ const MOOD_DATABASE = {
     doList: ['精神离职 / 提前钻被窝', '洗个热气腾腾热水澡', '静音手机 / 开启勿扰'],
     dontList: ['深夜网抑云 / 熬夜刷短视频', '强行营业 / 假装热情', '勉强自己 / 揽无谓责任'],
     quotes: [
-      { text: '“世界上只有一种真正的英雄主义，那就是认清生活后依然爱它。”', source: '— 罗曼·罗兰《米开朗琪罗传》' },
+      { text: '“世界上只有一种真正的英雄主义，那就是认清生活后依然爱它。”', source: '— 罗曼·罗兰' },
       { text: '“大脑已经下班，剩下的全靠肌肉记忆在敲键盘。”', source: '— 脆皮大学生观察录' },
       { text: '“正在低电量保护模式运行，请勿拍打喂食。”', source: '— 窝囊废文学精选' },
       { text: '“世界很大，但我现在只想缩进被窝里充会儿电。”', source: '— 晚安手账' }
@@ -1899,7 +1684,7 @@ const MOOD_DATABASE = {
 };
 
 /* ─────────────────────────────────────────────────────────────
-   7. 扩大化小人 + 丰富背景环境 + 宠物伴侣 Canvas 渲染引擎
+   7. 彩蛋状态与手绘场景伴侣渲染
    ───────────────────────────────────────────────────────────── */
 let eggState = {
   isDizzy: false,
@@ -1907,6 +1692,57 @@ let eggState = {
   isHeart: false,
   specialKeyword: null
 };
+
+function triggerEggBanner(text) {
+  const eggBanner = document.getElementById('egg-banner');
+  const eggBannerText = document.getElementById('egg-banner-text');
+  eggBannerText.textContent = text;
+  eggBanner.classList.add('show');
+  setTimeout(() => eggBanner.classList.remove('show'), 2800);
+}
+
+function spawnSvgFx(type, count = 14) {
+  const rect = document.getElementById('avatar-stage').getBoundingClientRect();
+  const startX = rect.left + rect.width / 2;
+  const startY = rect.top + rect.height / 2;
+
+  const SVG_SHAPES = {
+    heart: `<svg viewBox="0 0 24 24" width="26" height="26" fill="#FF4757"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`,
+    coin: `<svg viewBox="0 0 24 24" width="26" height="26" fill="#FFD700" stroke="#B87C14" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><text x="12" y="16" font-size="12" font-weight="bold" text-anchor="middle" fill="#B87C14">¥</text></svg>`,
+    paw: `<svg viewBox="0 0 24 24" width="26" height="26" fill="#53A548"><ellipse cx="12" cy="15" rx="5" ry="4"/><circle cx="6.5" cy="9.5" r="2"/><circle cx="10" cy="7" r="2"/><circle cx="14" cy="7" r="2"/><circle cx="17.5" cy="9.5" r="2"/></svg>`,
+    star: `<svg viewBox="0 0 24 24" width="26" height="26" fill="#FFD700" stroke="#B87C14" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
+    coffee: `<svg viewBox="0 0 24 24" width="26" height="26" fill="#8E6BB8" stroke="#3D261C" stroke-width="1.5"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/></svg>`
+  };
+
+  const template = SVG_SHAPES[type] || SVG_SHAPES.star;
+  const fxOverlay = document.getElementById('fx-overlay');
+
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'fx-particle';
+    el.innerHTML = template;
+
+    const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.5;
+    const dist1 = 25 + Math.random() * 40;
+    const dist2 = 70 + Math.random() * 100;
+
+    const dx1 = Math.cos(angle) * dist1;
+    const dx2 = Math.cos(angle) * dist2;
+    const rot1 = (Math.random() - 0.5) * 60 + 'deg';
+    const rot2 = (Math.random() - 0.5) * 180 + 'deg';
+
+    el.style.left = `${startX + (Math.random() - 0.5) * 30}px`;
+    el.style.top = `${startY + (Math.random() - 0.5) * 30}px`;
+    el.style.setProperty('--dx1', `${dx1}px`);
+    el.style.setProperty('--dx2', `${dx2}px`);
+    el.style.setProperty('--rot1', rot1);
+    el.style.setProperty('--rot2', rot2);
+    el.style.animationDelay = `${Math.random() * 0.12}s`;
+
+    fxOverlay.appendChild(el);
+    setTimeout(() => el.remove(), 1800);
+  }
+}
 
 function renderDoodleScene(canvas, seedStr, moodKey, animY = 0) {
   const ctx = canvas.getContext('2d');
@@ -1918,77 +1754,66 @@ function renderDoodleScene(canvas, seedStr, moodKey, animY = 0) {
   const colors = getComputedThemeColors();
   const moodData = MOOD_DATABASE[moodKey] || MOOD_DATABASE.happy;
 
-  // ──────────────── (A) 绘制丰富手绘背景与场景 ────────────────
+  // (A) 场景元素
   const sceneType = moodData.scene || 'nature';
   
   if (sceneType === 'bedroom') {
-    // 卧室：左侧小窗+月亮，右侧台灯
-    const win = [[30, 40], [130, 40], [130, 140], [30, 140]];
-    strokePts(ctx, rng, win, { w: 3, close: true, color: colors.ink, alpha: 0.6 });
-    line(ctx, rng, 80, 40, 80, 140, { w: 2, color: colors.ink, alpha: 0.5 });
-    line(ctx, rng, 30, 90, 130, 90, { w: 2, color: colors.ink, alpha: 0.5 });
-    strokePts(ctx, rng, ellipsePts(95, 70, 14, 14, 10, 0.4, Math.PI * 1.5), { w: 2.5, color: '#E5A93B' });
-    line(ctx, rng, W - 80, 150, W - 80, 90, { w: 3, color: colors.ink });
-    const shade = [[W - 100, 90], [W - 60, 90], [W - 70, 60], [W - 90, 60]];
+    const win = [[25, 30], [105, 30], [105, 110], [25, 110]];
+    strokePts(ctx, rng, win, { w: 2.5, close: true, color: colors.ink, alpha: 0.6 });
+    line(ctx, rng, 65, 30, 65, 110, { w: 1.8, color: colors.ink, alpha: 0.5 });
+    line(ctx, rng, 25, 70, 105, 70, { w: 1.8, color: colors.ink, alpha: 0.5 });
+    strokePts(ctx, rng, ellipsePts(78, 52, 11, 11, 10, 0.4, Math.PI * 1.5), { w: 2.2, color: '#E5A93B' });
+    line(ctx, rng, W - 65, 120, W - 65, 70, { w: 2.5, color: colors.ink });
+    const shade = [[W - 80, 70], [W - 50, 70], [W - 58, 48], [W - 72, 48]];
     polyFill(ctx, rng, shade, colors.accent, 0.35);
-    strokePts(ctx, rng, shade, { w: 2.5, close: true, color: colors.ink });
+    strokePts(ctx, rng, shade, { w: 2.2, close: true, color: colors.ink });
   } else if (sceneType === 'coffeeshop') {
-    // 咖啡馆：架子+盆栽+挂画
-    line(ctx, rng, 20, 90, 140, 90, { w: 3, color: colors.ink });
-    const pot = [[35, 90], [65, 90], [60, 120], [40, 120]];
+    line(ctx, rng, 15, 75, 115, 75, { w: 2.5, color: colors.ink });
+    const pot = [[28, 75], [52, 75], [48, 100], [32, 100]];
     polyFill(ctx, rng, pot, colors.paper);
-    strokePts(ctx, rng, pot, { w: 2.2, close: true, color: colors.ink });
-    line(ctx, rng, 50, 90, 38, 70, { w: 2.5, color: colors.accent });
-    line(ctx, rng, 50, 90, 62, 68, { w: 2.5, color: colors.accent });
-    line(ctx, rng, 50, 90, 50, 60, { w: 2.5, color: colors.accent });
-    const frame = [[W - 120, 40], [W - 40, 40], [W - 40, 110], [W - 120, 110]];
-    strokePts(ctx, rng, frame, { w: 2.5, close: true, color: colors.ink, alpha: 0.6 });
-    line(ctx, rng, W - 100, 75, W - 60, 75, { w: 2, color: colors.accent });
+    strokePts(ctx, rng, pot, { w: 2, close: true, color: colors.ink });
+    line(ctx, rng, 40, 75, 30, 58, { w: 2.2, color: colors.accent });
+    line(ctx, rng, 40, 75, 50, 56, { w: 2.2, color: colors.accent });
+    line(ctx, rng, 40, 75, 40, 50, { w: 2.2, color: colors.accent });
+    const frame = [[W - 95, 30], [W - 35, 30], [W - 35, 85], [W - 95, 85]];
+    strokePts(ctx, rng, frame, { w: 2.2, close: true, color: colors.ink, alpha: 0.6 });
+    line(ctx, rng, W - 80, 58, W - 50, 58, { w: 1.8, color: colors.accent });
   } else if (sceneType === 'workdesk') {
-    // 工位：电脑+书本
-    line(ctx, rng, 30, H - 110, W - 30, H - 110, { w: 3, color: colors.ink, alpha: 0.7 });
-    const laptop = [[50, H - 110], [120, H - 110], [115, H - 160], [55, H - 160]];
+    line(ctx, rng, 25, H - 75, W - 25, H - 75, { w: 2.5, color: colors.ink, alpha: 0.7 });
+    const laptop = [[40, H - 75], [95, H - 75], [90, H - 115], [45, H - 115]];
     polyFill(ctx, rng, laptop, colors.accent, 0.25);
-    strokePts(ctx, rng, laptop, { w: 2.5, close: true, color: colors.ink });
-    line(ctx, rng, 40, H - 110, 130, H - 110, { w: 3, color: colors.ink });
-    const book1 = [[W - 100, H - 110], [W - 45, H - 110], [W - 45, H - 125], [W - 100, H - 125]];
-    const book2 = [[W - 95, H - 125], [W - 50, H - 125], [W - 50, H - 140], [W - 95, H - 140]];
-    strokePts(ctx, rng, book1, { w: 2, close: true, color: colors.ink });
-    strokePts(ctx, rng, book2, { w: 2, close: true, color: colors.accent });
+    strokePts(ctx, rng, laptop, { w: 2.2, close: true, color: colors.ink });
+    line(ctx, rng, 32, H - 75, 102, H - 75, { w: 2.5, color: colors.ink });
+    const book1 = [[W - 80, H - 75], [W - 35, H - 75], [W - 35, H - 87], [W - 80, H - 87]];
+    strokePts(ctx, rng, book1, { w: 1.8, close: true, color: colors.ink });
   } else if (sceneType === 'rooftop') {
-    // 天台：星星+云朵
-    drawHandDrawnStar(ctx, rng, 60, 50, 12, colors);
-    drawHandDrawnStar(ctx, rng, 110, 90, 8, colors);
-    drawHandDrawnStar(ctx, rng, W - 80, 55, 14, colors);
-    drawHandDrawnStar(ctx, rng, W - 130, 85, 9, colors);
-    drawCloud(ctx, rng, 50, 130, 60, colors);
-    drawCloud(ctx, rng, W - 110, 140, 70, colors);
+    drawHandDrawnStar(ctx, rng, 45, 38, 10, colors);
+    drawHandDrawnStar(ctx, rng, W - 60, 42, 11, colors);
+    drawCloud(ctx, rng, 40, 95, 45, colors);
+    drawCloud(ctx, rng, W - 80, 100, 50, colors);
   } else {
-    // 晴空太阳
-    strokePts(ctx, rng, ellipsePts(60, 60, 24, 24, 12), { w: 3, close: true, color: '#E5A93B' });
+    strokePts(ctx, rng, ellipsePts(48, 48, 18, 18, 12), { w: 2.5, close: true, color: '#E5A93B' });
     for (let a = 0; a < Math.PI * 2; a += 0.8) {
-      line(ctx, rng, 60 + Math.cos(a) * 28, 60 + Math.sin(a) * 28, 60 + Math.cos(a) * 38, 60 + Math.sin(a) * 38, { w: 2.2, color: '#E5A93B' });
+      line(ctx, rng, 48 + Math.cos(a) * 22, 48 + Math.sin(a) * 22, 48 + Math.cos(a) * 29, 48 + Math.sin(a) * 29, { w: 1.8, color: '#E5A93B' });
     }
-    drawCloud(ctx, rng, W - 100, 70, 75, colors);
+    drawCloud(ctx, rng, W - 75, 55, 55, colors);
   }
 
-  // ──────────────── (B) 绘制主体手绘小人 (加大比例 1.35x) ────────────────
+  // (B) 绘制主体小人
   const cx = W / 2;
-  const cy = H / 2 + 10 + animY;
-  const scale = 1.32;
+  const cy = H / 2 + 5 + animY;
+  const scale = 1.25;
 
-  // 1. 地面投影
   strokePts(ctx, rng, [
-    [cx - 95 * scale, cy + 130],
-    [cx - 20, cy + 133],
-    [cx + 35, cy + 129],
-    [cx + 95 * scale, cy + 131]
-  ], { w: 3.5, wob: 2.2, color: colors.ink, alpha: 0.35 });
+    [cx - 75 * scale, cy + 95],
+    [cx - 15, cy + 97],
+    [cx + 25, cy + 94],
+    [cx + 75 * scale, cy + 96]
+  ], { w: 3, wob: 2.0, color: colors.ink, alpha: 0.35 });
 
-  // 2. 身体与衣服
-  const bodyW = (64 + jit(rng, 6)) * scale;
-  const bodyH = (72 + jit(rng, 6)) * scale;
-  const bodyTop = cy + 5;
+  const bodyW = (54 + jit(rng, 5)) * scale;
+  const bodyH = (60 + jit(rng, 5)) * scale;
+  const bodyTop = cy + 2;
   const outfitStyle = Math.floor(rng() * 4);
 
   const bodyPts = [
@@ -2000,140 +1825,139 @@ function renderDoodleScene(canvas, seedStr, moodKey, animY = 0) {
 
   polyFill(ctx, rng, bodyPts, colors.paper);
   polyFill(ctx, rng, bodyPts, colors.accent, eggState.isKoi ? 0.45 : 0.24);
-  strokePts(ctx, rng, bodyPts, { w: 4, close: true, color: colors.ink });
+  strokePts(ctx, rng, bodyPts, { w: 3.5, close: true, color: colors.ink });
 
   if (eggState.isKoi) {
-    for (let y = bodyTop + 22; y < bodyTop + bodyH - 10; y += 18) {
-      strokePts(ctx, rng, ellipsePts(cx, y, 20, 10, 6, 0, Math.PI), { w: 2.5, color: '#B87C14' });
+    for (let y = bodyTop + 18; y < bodyTop + bodyH - 8; y += 15) {
+      strokePts(ctx, rng, ellipsePts(cx, y, 16, 8, 6, 0, Math.PI), { w: 2.2, color: '#B87C14' });
     }
   } else if (outfitStyle === 0) {
-    for (let y = bodyTop + 22; y < bodyTop + bodyH - 8; y += 22) {
-      line(ctx, rng, cx - bodyW * 0.75, y, cx + bodyW * 0.75, y, { w: 2.5, color: colors.ink, alpha: 0.5 });
+    for (let y = bodyTop + 18; y < bodyTop + bodyH - 6; y += 18) {
+      line(ctx, rng, cx - bodyW * 0.75, y, cx + bodyW * 0.75, y, { w: 2.2, color: colors.ink, alpha: 0.5 });
     }
   } else if (outfitStyle === 1) {
-    line(ctx, rng, cx - 22, bodyTop, cx - 22, bodyTop + 40, { w: 3.2, color: colors.ink });
-    line(ctx, rng, cx + 22, bodyTop, cx + 22, bodyTop + 40, { w: 3.2, color: colors.ink });
+    line(ctx, rng, cx - 18, bodyTop, cx - 18, bodyTop + 32, { w: 2.8, color: colors.ink });
+    line(ctx, rng, cx + 18, bodyTop, cx + 18, bodyTop + 32, { w: 2.8, color: colors.ink });
     const pocket = [
-      [cx - 16, bodyTop + 38],
-      [cx + 16, bodyTop + 38],
-      [cx + 16, bodyTop + 62],
-      [cx - 16, bodyTop + 62]
+      [cx - 13, bodyTop + 30],
+      [cx + 13, bodyTop + 30],
+      [cx + 13, bodyTop + 50],
+      [cx - 13, bodyTop + 50]
     ];
     polyFill(ctx, rng, pocket, colors.accent, 0.4);
-    strokePts(ctx, rng, pocket, { w: 2.5, close: true, color: colors.ink });
+    strokePts(ctx, rng, pocket, { w: 2.2, close: true, color: colors.ink });
   } else if (outfitStyle === 2) {
-    strokePts(ctx, rng, [[cx - 10, bodyTop + 6], [cx + 10, bodyTop + 6], [cx, bodyTop + 16]], { w: 2.5, close: true, color: colors.ink });
-    strokePts(ctx, rng, [[cx - 7, bodyTop + 16], [cx + 7, bodyTop + 16], [cx, bodyTop + 42]], { w: 2.5, close: true, color: colors.ink });
+    strokePts(ctx, rng, [[cx - 8, bodyTop + 5], [cx + 8, bodyTop + 5], [cx, bodyTop + 13]], { w: 2.2, close: true, color: colors.ink });
+    strokePts(ctx, rng, [[cx - 5, bodyTop + 13], [cx + 5, bodyTop + 13], [cx, bodyTop + 34]], { w: 2.2, close: true, color: colors.ink });
   } else {
     const pouch = [
-      [cx - 28, bodyTop + 42],
-      [cx + 28, bodyTop + 42],
-      [cx + 24, bodyTop + 72],
-      [cx - 24, bodyTop + 72]
+      [cx - 22, bodyTop + 34],
+      [cx + 22, bodyTop + 34],
+      [cx + 18, bodyTop + 58],
+      [cx - 18, bodyTop + 58]
     ];
-    strokePts(ctx, rng, pouch, { w: 2.5, close: true, color: colors.ink });
+    strokePts(ctx, rng, pouch, { w: 2.2, close: true, color: colors.ink });
   }
 
-  // 3. 双腿与鞋子
+  // 腿与鞋
   const legY0 = bodyTop + bodyH;
-  const legY1 = legY0 + 44;
-  line(ctx, rng, cx - 30, legY0, cx - 34, legY1, { w: 4.5, color: colors.ink });
-  blobFill(ctx, rng, cx - 44, legY1 + 5, 15, 8, colors.ink);
-  line(ctx, rng, cx + 30, legY0, cx + 34, legY1, { w: 4.5, color: colors.ink });
-  blobFill(ctx, rng, cx + 46, legY1 + 5, 15, 8, colors.ink);
+  const legY1 = legY0 + 36;
+  line(ctx, rng, cx - 24, legY0, cx - 27, legY1, { w: 3.8, color: colors.ink });
+  blobFill(ctx, rng, cx - 35, legY1 + 4, 12, 7, colors.ink);
+  line(ctx, rng, cx + 24, legY0, cx + 27, legY1, { w: 3.8, color: colors.ink });
+  blobFill(ctx, rng, cx + 37, legY1 + 4, 12, 7, colors.ink);
 
-  // 4. 手臂与手持道具
-  const shoulderY = bodyTop + 14;
+  // 手臂
+  const shoulderY = bodyTop + 10;
 
   if (eggState.specialKeyword === 'cat') {
-    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - 20, shoulderY + 40, { w: 4, color: colors.ink });
-    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + 20, shoulderY + 40, { w: 4, color: colors.ink });
-    blobFill(ctx, rng, cx, shoulderY + 34, 20, 16, colors.accent, 0.75);
-    strokePts(ctx, rng, ellipsePts(cx, shoulderY + 34, 20, 16, 12), { w: 2.8, close: true, color: colors.ink });
-    polyFill(ctx, rng, [[cx - 15, shoulderY + 22], [cx - 8, shoulderY + 22], [cx - 13, shoulderY + 10]], colors.ink);
-    polyFill(ctx, rng, [[cx + 15, shoulderY + 22], [cx + 8, shoulderY + 22], [cx + 13, shoulderY + 10]], colors.ink);
+    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - 16, shoulderY + 32, { w: 3.5, color: colors.ink });
+    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + 16, shoulderY + 32, { w: 3.5, color: colors.ink });
+    blobFill(ctx, rng, cx, shoulderY + 28, 16, 13, colors.accent, 0.75);
+    strokePts(ctx, rng, ellipsePts(cx, shoulderY + 28, 16, 13, 12), { w: 2.5, close: true, color: colors.ink });
+    polyFill(ctx, rng, [[cx - 12, shoulderY + 18], [cx - 6, shoulderY + 18], [cx - 10, shoulderY + 8]], colors.ink);
+    polyFill(ctx, rng, [[cx + 12, shoulderY + 18], [cx + 6, shoulderY + 18], [cx + 10, shoulderY + 8]], colors.ink);
   } else if (eggState.specialKeyword === 'money' || eggState.isKoi) {
-    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 1.1, shoulderY - 34, { w: 4, color: colors.ink });
-    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 1.1, shoulderY - 34, { w: 4, color: colors.ink });
-    drawHandDrawnStar(ctx, rng, cx + bodyW * 1.18, shoulderY - 50, 18, colors);
-    line(ctx, rng, cx + bodyW * 1.1, shoulderY - 28, cx + bodyW * 1.18, shoulderY - 50, { w: 3.5, color: '#B87C14' });
+    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 1.1, shoulderY - 28, { w: 3.5, color: colors.ink });
+    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 1.1, shoulderY - 28, { w: 3.5, color: colors.ink });
+    drawHandDrawnStar(ctx, rng, cx + bodyW * 1.16, shoulderY - 42, 15, colors);
+    line(ctx, rng, cx + bodyW * 1.1, shoulderY - 24, cx + bodyW * 1.16, shoulderY - 42, { w: 3, color: '#B87C14' });
   } else if (moodKey === 'happy') {
-    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 1.15, shoulderY - 44, { w: 4, color: colors.ink });
-    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 1.15, shoulderY - 44, { w: 4, color: colors.ink });
-    const bx = cx + bodyW * 1.25, by = shoulderY - 80;
-    line(ctx, rng, cx + bodyW * 1.15, shoulderY - 44, bx, by + 22, { w: 2, color: colors.ink });
-    blobFill(ctx, rng, bx, by, 20, 24, colors.accent, 0.85);
-    strokePts(ctx, rng, ellipsePts(bx, by, 20, 24, 14), { w: 2.8, close: true, color: colors.ink });
+    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 1.15, shoulderY - 36, { w: 3.5, color: colors.ink });
+    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 1.15, shoulderY - 36, { w: 3.5, color: colors.ink });
+    const bx = cx + bodyW * 1.22, by = shoulderY - 65;
+    line(ctx, rng, cx + bodyW * 1.15, shoulderY - 36, bx, by + 18, { w: 1.8, color: colors.ink });
+    blobFill(ctx, rng, bx, by, 16, 20, colors.accent, 0.85);
+    strokePts(ctx, rng, ellipsePts(bx, by, 16, 20, 14), { w: 2.4, close: true, color: colors.ink });
   } else if (moodKey === 'chill' || eggState.specialKeyword === 'coffee') {
-    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 0.95, shoulderY + 26, { w: 4, color: colors.ink });
-    line(ctx, rng, cx - bodyW * 0.95, shoulderY + 26, cx - bodyW * 0.65, shoulderY + 52, { w: 4, color: colors.ink });
-    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 1.05, shoulderY + 22, { w: 4, color: colors.ink });
-    const mx = cx + bodyW * 1.18, my = shoulderY + 22;
-    const cup = [[mx - 9, my - 7], [mx + 9, my - 7], [mx + 6, my + 10], [mx - 6, my + 10]];
+    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 0.95, shoulderY + 22, { w: 3.5, color: colors.ink });
+    line(ctx, rng, cx - bodyW * 0.95, shoulderY + 22, cx - bodyW * 0.65, shoulderY + 42, { w: 3.5, color: colors.ink });
+    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 1.05, shoulderY + 18, { w: 3.5, color: colors.ink });
+    const mx = cx + bodyW * 1.15, my = shoulderY + 18;
+    const cup = [[mx - 7, my - 6], [mx + 7, my - 6], [mx + 5, my + 8], [mx - 5, my + 8]];
     polyFill(ctx, rng, cup, colors.paper);
-    strokePts(ctx, rng, cup, { w: 2.5, close: true, color: colors.ink });
-    line(ctx, rng, mx - 3, my - 10, mx - 3, my - 18, { w: 2, color: colors.accent });
-    line(ctx, rng, mx + 3, my - 10, mx + 3, my - 18, { w: 2, color: colors.accent });
+    strokePts(ctx, rng, cup, { w: 2.2, close: true, color: colors.ink });
+    line(ctx, rng, mx - 2, my - 8, mx - 2, my - 15, { w: 1.8, color: colors.accent });
+    line(ctx, rng, mx + 2, my - 8, mx + 2, my - 15, { w: 1.8, color: colors.accent });
   } else if (moodKey === 'curious') {
-    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 0.85, shoulderY + 32, { w: 4, color: colors.ink });
-    line(ctx, rng, cx - bodyW * 0.85, shoulderY + 32, cx - 14, shoulderY - 8, { w: 4, color: colors.ink });
-    const lx = cx + bodyW * 0.95, ly = shoulderY + 12;
-    line(ctx, rng, cx + bodyW * 0.68, shoulderY, lx, ly, { w: 4, color: colors.ink });
-    strokePts(ctx, rng, ellipsePts(lx + 10, ly - 10, 13, 13, 12), { w: 2.8, close: true, color: colors.accent });
-    line(ctx, rng, lx + 18, ly, lx + 28, ly + 10, { w: 3.5, color: colors.ink });
+    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 0.85, shoulderY + 26, { w: 3.5, color: colors.ink });
+    line(ctx, rng, cx - bodyW * 0.85, shoulderY + 26, cx - 12, shoulderY - 6, { w: 3.5, color: colors.ink });
+    const lx = cx + bodyW * 0.95, ly = shoulderY + 10;
+    line(ctx, rng, cx + bodyW * 0.68, shoulderY, lx, ly, { w: 3.5, color: colors.ink });
+    strokePts(ctx, rng, ellipsePts(lx + 8, ly - 8, 11, 11, 12), { w: 2.4, close: true, color: colors.accent });
+    line(ctx, rng, lx + 15, ly, lx + 23, ly + 8, { w: 3, color: colors.ink });
   } else if (moodKey === 'cozy') {
-    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - 16, shoulderY + 34, { w: 4, color: colors.ink });
-    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + 16, shoulderY + 34, { w: 4, color: colors.ink });
-    blobFill(ctx, rng, cx, shoulderY + 32, 22, 15, colors.accent, 0.4);
-    strokePts(ctx, rng, ellipsePts(cx, shoulderY + 32, 22, 15, 12), { w: 2.5, close: true, color: colors.ink });
+    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - 13, shoulderY + 28, { w: 3.5, color: colors.ink });
+    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + 13, shoulderY + 28, { w: 3.5, color: colors.ink });
+    blobFill(ctx, rng, cx, shoulderY + 26, 18, 12, colors.accent, 0.4);
+    strokePts(ctx, rng, ellipsePts(cx, shoulderY + 26, 18, 12, 12), { w: 2.2, close: true, color: colors.ink });
   } else {
-    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 0.9, shoulderY + 44, { w: 4, color: colors.ink });
-    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 0.9, shoulderY + 44, { w: 4, color: colors.ink });
+    line(ctx, rng, cx - bodyW * 0.68, shoulderY, cx - bodyW * 0.9, shoulderY + 36, { w: 3.5, color: colors.ink });
+    line(ctx, rng, cx + bodyW * 0.68, shoulderY, cx + bodyW * 0.9, shoulderY + 36, { w: 3.5, color: colors.ink });
   }
 
-  // 5. 头部
-  const headR = (50 + jit(rng, 4)) * scale;
-  const headCY = cy - 70;
+  // 头部
+  const headR = (42 + jit(rng, 3)) * scale;
+  const headCY = cy - 56;
   blobFill(ctx, rng, cx, headCY, headR, headR * 0.96, colors.paper);
-  strokePts(ctx, rng, ellipsePts(cx, headCY, headR, headR * 0.96, 16), { w: 4.2, close: true, color: colors.ink });
+  strokePts(ctx, rng, ellipsePts(cx, headCY, headR, headR * 0.96, 16), { w: 3.6, close: true, color: colors.ink });
 
-  // 腮红
-  blobFill(ctx, rng, cx - headR * 0.58, headCY + 18, 14, 9, '#f59e9e', 0.55);
-  blobFill(ctx, rng, cx + headR * 0.58, headCY + 18, 14, 9, '#f59e9e', 0.55);
+  blobFill(ctx, rng, cx - headR * 0.58, headCY + 14, 11, 7, '#f59e9e', 0.55);
+  blobFill(ctx, rng, cx + headR * 0.58, headCY + 14, 11, 7, '#f59e9e', 0.55);
 
-  // 6. 发型与头饰
+  // 发型
   const hairStyle = Math.floor(rng() * 7);
   if (eggState.specialKeyword === 'cat') {
     const earL = [[cx - headR * 0.7, headCY - headR * 0.6], [cx - headR * 0.3, headCY - headR * 0.9], [cx - headR * 0.8, headCY - headR * 1.15]];
     const earR = [[cx + headR * 0.7, headCY - headR * 0.6], [cx + headR * 0.3, headCY - headR * 0.9], [cx + headR * 0.8, headCY - headR * 1.15]];
     polyFill(ctx, rng, earL, colors.accent, 0.6);
-    strokePts(ctx, rng, earL, { w: 3.5, close: true, color: colors.ink });
+    strokePts(ctx, rng, earL, { w: 3, close: true, color: colors.ink });
     polyFill(ctx, rng, earR, colors.accent, 0.6);
-    strokePts(ctx, rng, earR, { w: 3.5, close: true, color: colors.ink });
+    strokePts(ctx, rng, earR, { w: 3, close: true, color: colors.ink });
   } else if (eggState.isKoi) {
     const crown = [
-      [cx - 28, headCY - headR + 4],
-      [cx + 28, headCY - headR + 4],
-      [cx + 30, headCY - headR - 26],
-      [cx + 14, headCY - headR - 12],
-      [cx, headCY - headR - 30],
-      [cx - 14, headCY - headR - 12],
-      [cx - 30, headCY - headR - 26]
+      [cx - 22, headCY - headR + 3],
+      [cx + 22, headCY - headR + 3],
+      [cx + 24, headCY - headR - 20],
+      [cx + 11, headCY - headR - 9],
+      [cx, headCY - headR - 24],
+      [cx - 11, headCY - headR - 9],
+      [cx - 24, headCY - headR - 20]
     ];
     polyFill(ctx, rng, crown, '#FFD700');
-    strokePts(ctx, rng, crown, { w: 3.2, close: true, color: '#B87C14' });
+    strokePts(ctx, rng, crown, { w: 2.8, close: true, color: '#B87C14' });
   } else if (hairStyle === 0) {
-    line(ctx, rng, cx, headCY - headR, cx - 14, headCY - headR - 32, { w: 4, color: colors.ink });
-    line(ctx, rng, cx + 5, headCY - headR, cx + 18, headCY - headR - 28, { w: 3.5, color: colors.ink });
-    blobFill(ctx, rng, cx - 16, headCY - headR - 32, 6, 5, colors.accent);
+    line(ctx, rng, cx, headCY - headR, cx - 11, headCY - headR - 26, { w: 3.5, color: colors.ink });
+    line(ctx, rng, cx + 4, headCY - headR, cx + 15, headCY - headR - 22, { w: 3, color: colors.ink });
+    blobFill(ctx, rng, cx - 13, headCY - headR - 26, 5, 4, colors.accent);
   } else if (hairStyle === 1) {
     const hairPts = ellipsePts(cx, headCY, headR * 1.04, headR * 1.04, 14, Math.PI * 0.88, Math.PI * 2.12);
-    strokePts(ctx, rng, hairPts, { w: 5.5, color: colors.ink });
+    strokePts(ctx, rng, hairPts, { w: 4.8, color: colors.ink });
   } else if (hairStyle === 2) {
     for (let angle = Math.PI * 0.78; angle <= Math.PI * 2.22; angle += 0.28) {
-      const hx = cx + Math.cos(angle) * (headR + 9);
-      const hy = headCY + Math.sin(angle) * (headR + 9);
-      blobFill(ctx, rng, hx, hy, 15, 15, colors.ink, 0.88);
+      const hx = cx + Math.cos(angle) * (headR + 7);
+      const hy = headCY + Math.sin(angle) * (headR + 7);
+      blobFill(ctx, rng, hx, hy, 12, 12, colors.ink, 0.88);
     }
   } else if (hairStyle === 3) {
     const hatPts = [
@@ -2143,96 +1967,93 @@ function renderDoodleScene(canvas, seedStr, moodKey, animY = 0) {
       [cx - headR * 0.65, headCY - headR * 1.05]
     ];
     polyFill(ctx, rng, hatPts, colors.accent);
-    strokePts(ctx, rng, hatPts, { w: 3.6, close: true, color: colors.ink });
-    blobFill(ctx, rng, cx, headCY - headR * 1.2, 8, 8, colors.paper);
-    strokePts(ctx, rng, ellipsePts(cx, headCY - headR * 1.2, 8, 8), { w: 2.2, close: true, color: colors.ink });
+    strokePts(ctx, rng, hatPts, { w: 3, close: true, color: colors.ink });
+    blobFill(ctx, rng, cx, headCY - headR * 1.2, 7, 7, colors.paper);
+    strokePts(ctx, rng, ellipsePts(cx, headCY - headR * 1.2, 7, 7), { w: 2, close: true, color: colors.ink });
   } else if (hairStyle === 4) {
-    blobFill(ctx, rng, cx - headR * 0.8, headCY - headR * 0.7, 16, 16, colors.ink, 0.88);
-    blobFill(ctx, rng, cx + headR * 0.8, headCY - headR * 0.7, 16, 16, colors.ink, 0.88);
+    blobFill(ctx, rng, cx - headR * 0.8, headCY - headR * 0.7, 13, 13, colors.ink, 0.88);
+    blobFill(ctx, rng, cx + headR * 0.8, headCY - headR * 0.7, 13, 13, colors.ink, 0.88);
   } else if (hairStyle === 5) {
     const headBand = ellipsePts(cx, headCY, headR * 1.15, headR * 1.15, 12, Math.PI * 1.1, Math.PI * 1.9);
-    strokePts(ctx, rng, headBand, { w: 4.5, color: colors.ink });
-    blobFill(ctx, rng, cx - headR * 1.05, headCY + 2, 14, 20, colors.accent);
-    strokePts(ctx, rng, ellipsePts(cx - headR * 1.05, headCY + 2, 14, 20, 8), { w: 2.8, close: true, color: colors.ink });
-    blobFill(ctx, rng, cx + headR * 1.05, headCY + 2, 14, 20, colors.accent);
-    strokePts(ctx, rng, ellipsePts(cx + headR * 1.05, headCY + 2, 14, 20, 8), { w: 2.8, close: true, color: colors.ink });
+    strokePts(ctx, rng, headBand, { w: 3.8, color: colors.ink });
+    blobFill(ctx, rng, cx - headR * 1.05, headCY + 2, 11, 16, colors.accent);
+    strokePts(ctx, rng, ellipsePts(cx - headR * 1.05, headCY + 2, 11, 16, 8), { w: 2.2, close: true, color: colors.ink });
+    blobFill(ctx, rng, cx + headR * 1.05, headCY + 2, 11, 16, colors.accent);
+    strokePts(ctx, rng, ellipsePts(cx + headR * 1.05, headCY + 2, 11, 16, 8), { w: 2.2, close: true, color: colors.ink });
   } else {
     const knitCap = ellipsePts(cx, headCY - headR * 0.3, headR * 1.08, headR * 0.9, 14, Math.PI * 1.0, Math.PI * 2.0);
     polyFill(ctx, rng, knitCap, colors.accent);
-    strokePts(ctx, rng, knitCap, { w: 4, color: colors.ink });
-    blobFill(ctx, rng, cx, headCY - headR * 1.25, 10, 10, colors.paper);
-    strokePts(ctx, rng, ellipsePts(cx, headCY - headR * 1.25, 10, 10), { w: 2.2, close: true, color: colors.ink });
+    strokePts(ctx, rng, knitCap, { w: 3.2, color: colors.ink });
+    blobFill(ctx, rng, cx, headCY - headR * 1.25, 8, 8, colors.paper);
+    strokePts(ctx, rng, ellipsePts(cx, headCY - headR * 1.25, 8, 8), { w: 2, close: true, color: colors.ink });
   }
 
-  // 7. 眼睛与神态
-  const eyeSpan = (18 + jit(rng, 3)) * scale;
+  // 眼睛与神态
+  const eyeSpan = (15 + jit(rng, 2)) * scale;
   const eyeY = headCY + 2;
 
   if (eggState.isDizzy) {
-    drawSpiralEye(ctx, rng, cx - eyeSpan, eyeY, 12, colors.ink);
-    drawSpiralEye(ctx, rng, cx + eyeSpan, eyeY, 12, colors.ink);
-    strokePts(ctx, rng, ellipsePts(cx, eyeY + 18, 12, 10, 8, 0, Math.PI), { w: 3, color: colors.ink });
-    blobFill(ctx, rng, cx, eyeY + 25, 8, 10, '#ff6b6b');
-    drawHandDrawnStar(ctx, rng, cx - 24, headCY - headR - 20, 11, colors);
-    drawHandDrawnStar(ctx, rng, cx + 24, headCY - headR - 26, 13, colors);
+    drawSpiralEye(ctx, rng, cx - eyeSpan, eyeY, 10, colors.ink);
+    drawSpiralEye(ctx, rng, cx + eyeSpan, eyeY, 10, colors.ink);
+    strokePts(ctx, rng, ellipsePts(cx, eyeY + 14, 10, 7, 8, 0, Math.PI), { w: 2.6, color: colors.ink });
+    blobFill(ctx, rng, cx, eyeY + 20, 6, 8, '#ff6b6b');
+    drawHandDrawnStar(ctx, rng, cx - 18, headCY - headR - 16, 9, colors);
+    drawHandDrawnStar(ctx, rng, cx + 18, headCY - headR - 20, 10, colors);
   } else if (eggState.isHeart) {
-    drawHeart(ctx, rng, cx - eyeSpan, eyeY, 12, '#ff4757');
-    drawHeart(ctx, rng, cx + eyeSpan, eyeY, 12, '#ff4757');
-    strokePts(ctx, rng, ellipsePts(cx, eyeY + 18, 14, 10, 6, 0.2, Math.PI - 0.2), { w: 3.5, color: colors.ink });
+    drawHeart(ctx, rng, cx - eyeSpan, eyeY, 10, '#ff4757');
+    drawHeart(ctx, rng, cx + eyeSpan, eyeY, 10, '#ff4757');
+    strokePts(ctx, rng, ellipsePts(cx, eyeY + 14, 11, 8, 6, 0.2, Math.PI - 0.2), { w: 2.8, color: colors.ink });
   } else if (moodKey === 'happy') {
-    strokePts(ctx, rng, ellipsePts(cx - eyeSpan, eyeY, 12, 10, 6, Math.PI + 0.3, Math.PI * 2 - 0.3), { w: 4, color: colors.ink });
-    strokePts(ctx, rng, ellipsePts(cx + eyeSpan, eyeY, 12, 10, 6, Math.PI + 0.3, Math.PI * 2 - 0.3), { w: 4, color: colors.ink });
-    strokePts(ctx, rng, ellipsePts(cx, eyeY + 18, 15, 11, 8, 0.2, Math.PI - 0.2), { w: 3.5, close: true, color: colors.ink });
-    blobFill(ctx, rng, cx, eyeY + 22, 10, 6, '#e06d6d');
+    strokePts(ctx, rng, ellipsePts(cx - eyeSpan, eyeY, 10, 8, 6, Math.PI + 0.3, Math.PI * 2 - 0.3), { w: 3.2, color: colors.ink });
+    strokePts(ctx, rng, ellipsePts(cx + eyeSpan, eyeY, 10, 8, 6, Math.PI + 0.3, Math.PI * 2 - 0.3), { w: 3.2, color: colors.ink });
+    strokePts(ctx, rng, ellipsePts(cx, eyeY + 14, 12, 9, 8, 0.2, Math.PI - 0.2), { w: 2.8, close: true, color: colors.ink });
+    blobFill(ctx, rng, cx, eyeY + 17, 8, 5, '#e06d6d');
   } else if (moodKey === 'tired') {
-    line(ctx, rng, cx - eyeSpan - 11, eyeY, cx - eyeSpan + 11, eyeY, { w: 4.2, color: colors.ink });
-    line(ctx, rng, cx + eyeSpan - 11, eyeY, cx + eyeSpan + 11, eyeY, { w: 4.2, color: colors.ink });
-    line(ctx, rng, cx - 11, eyeY + 24, cx + 11, eyeY + 22, { w: 3.2, color: colors.ink });
+    line(ctx, rng, cx - eyeSpan - 9, eyeY, cx - eyeSpan + 9, eyeY, { w: 3.5, color: colors.ink });
+    line(ctx, rng, cx + eyeSpan - 9, eyeY, cx + eyeSpan + 9, eyeY, { w: 3.5, color: colors.ink });
+    line(ctx, rng, cx - 9, eyeY + 19, cx + 9, eyeY + 17, { w: 2.6, color: colors.ink });
   } else if (moodKey === 'rage') {
-    line(ctx, rng, cx - eyeSpan - 11, eyeY - 7, cx - eyeSpan + 9, eyeY + 2, { w: 4.2, color: colors.ink });
-    line(ctx, rng, cx + eyeSpan + 11, eyeY - 7, cx + eyeSpan - 9, eyeY + 2, { w: 4.2, color: colors.ink });
-    const zx = cx - 13, zy = eyeY + 24;
-    strokePts(ctx, rng, [[zx, zy], [zx+6, zy-4], [zx+12, zy+4], [zx+18, zy-4], [zx+24, zy]], { w: 3.2, color: colors.ink });
+    line(ctx, rng, cx - eyeSpan - 9, eyeY - 5, cx - eyeSpan + 7, eyeY + 2, { w: 3.5, color: colors.ink });
+    line(ctx, rng, cx + eyeSpan + 9, eyeY - 5, cx + eyeSpan - 7, eyeY + 2, { w: 3.5, color: colors.ink });
+    const zx = cx - 10, zy = eyeY + 19;
+    strokePts(ctx, rng, [[zx, zy], [zx+5, zy-3], [zx+10, zy+3], [zx+15, zy-3], [zx+20, zy]], { w: 2.6, color: colors.ink });
   } else if (moodKey === 'cozy') {
-    strokePts(ctx, rng, ellipsePts(cx - eyeSpan, eyeY + 2, 11, 7, 6, 0.3, Math.PI - 0.3), { w: 3.5, color: colors.ink });
-    strokePts(ctx, rng, ellipsePts(cx + eyeSpan, eyeY + 2, 11, 7, 6, 0.3, Math.PI - 0.3), { w: 3.5, color: colors.ink });
-    strokePts(ctx, rng, ellipsePts(cx, eyeY + 18, 9, 5, 6, 0.3, Math.PI - 0.3), { w: 2.8, color: colors.ink });
+    strokePts(ctx, rng, ellipsePts(cx - eyeSpan, eyeY + 2, 9, 6, 6, 0.3, Math.PI - 0.3), { w: 2.8, color: colors.ink });
+    strokePts(ctx, rng, ellipsePts(cx + eyeSpan, eyeY + 2, 9, 6, 6, 0.3, Math.PI - 0.3), { w: 2.8, color: colors.ink });
+    strokePts(ctx, rng, ellipsePts(cx, eyeY + 14, 7, 4, 6, 0.3, Math.PI - 0.3), { w: 2.2, color: colors.ink });
   } else {
-    blobFill(ctx, rng, cx - eyeSpan, eyeY, 7.5, 7.5, colors.ink);
-    blobFill(ctx, rng, cx - eyeSpan - 2.5, eyeY - 2.5, 2.5, 2.5, '#fff');
-    blobFill(ctx, rng, cx + eyeSpan, eyeY, 7.5, 7.5, colors.ink);
-    blobFill(ctx, rng, cx + eyeSpan - 2.5, eyeY - 2.5, 2.5, 2.5, '#fff');
-    strokePts(ctx, rng, ellipsePts(cx, eyeY + 18, 11, 7, 6, 0.3, Math.PI - 0.3), { w: 3.2, color: colors.ink });
+    blobFill(ctx, rng, cx - eyeSpan, eyeY, 6, 6, colors.ink);
+    blobFill(ctx, rng, cx - eyeSpan - 2, eyeY - 2, 2, 2, '#fff');
+    blobFill(ctx, rng, cx + eyeSpan, eyeY, 6, 6, colors.ink);
+    blobFill(ctx, rng, cx + eyeSpan - 2, eyeY - 2, 2, 2, '#fff');
+    strokePts(ctx, rng, ellipsePts(cx, eyeY + 14, 9, 6, 6, 0.3, Math.PI - 0.3), { w: 2.6, color: colors.ink });
   }
 
-  // ──────────────── (C) 绘制专属宠物伴侣 (卡皮巴拉/猫咪/小狗) ────────────────
+  // (C) 宠物伴侣 (卡皮巴拉/猫/狗)
   const petType = eggState.specialKeyword === 'cat' ? 'cat' : (moodData.pet || 'capybara');
-  const petX = cx + 110;
-  const petY = cy + 95;
+  const petX = cx + 88;
+  const petY = cy + 72;
 
   if (petType === 'capybara') {
-    // 卡皮巴拉：圆润身材 + 头顶小橙子
-    const capy = [[petX - 25, petY], [petX + 25, petY], [petX + 22, petY + 28], [petX - 22, petY + 28]];
+    const capy = [[petX - 20, petY], [petX + 20, petY], [petX + 18, petY + 22], [petX - 18, petY + 22]];
     polyFill(ctx, rng, capy, '#A07855', 0.85);
-    strokePts(ctx, rng, capy, { w: 2.8, close: true, color: colors.ink });
-    blobFill(ctx, rng, petX - 10, petY + 8, 3, 3, colors.ink);
-    blobFill(ctx, rng, petX, petY - 7, 6, 6, '#FF9800');
-    strokePts(ctx, rng, ellipsePts(petX, petY - 7, 6, 6, 8), { w: 1.8, close: true, color: colors.ink });
-    line(ctx, rng, petX, petY - 13, petX + 2, petY - 17, { w: 1.5, color: '#4CAF50' });
+    strokePts(ctx, rng, capy, { w: 2.4, close: true, color: colors.ink });
+    blobFill(ctx, rng, petX - 8, petY + 6, 2.5, 2.5, colors.ink);
+    blobFill(ctx, rng, petX, petY - 5, 5, 5, '#FF9800');
+    strokePts(ctx, rng, ellipsePts(petX, petY - 5, 5, 5, 8), { w: 1.5, close: true, color: colors.ink });
+    line(ctx, rng, petX, petY - 10, petX + 2, petY - 13, { w: 1.2, color: '#4CAF50' });
   } else if (petType === 'cat') {
-    // 睡觉小猫
-    blobFill(ctx, rng, petX, petY + 12, 18, 14, colors.accent, 0.65);
-    strokePts(ctx, rng, ellipsePts(petX, petY + 12, 18, 14, 10), { w: 2.5, close: true, color: colors.ink });
-    polyFill(ctx, rng, [[petX - 12, petY], [petX - 5, petY], [petX - 10, petY - 8]], colors.ink);
-    polyFill(ctx, rng, [[petX + 5, petY], [petX + 12, petY], [petX + 10, petY - 8]], colors.ink);
-    line(ctx, rng, petX + 18, petY + 12, petX + 28, petY + 2, { w: 2.5, color: colors.ink });
+    blobFill(ctx, rng, petX, petY + 8, 14, 11, colors.accent, 0.65);
+    strokePts(ctx, rng, ellipsePts(petX, petY + 8, 14, 11, 10), { w: 2, close: true, color: colors.ink });
+    polyFill(ctx, rng, [[petX - 10, petY], [petX - 4, petY], [petX - 8, petY - 6]], colors.ink);
+    polyFill(ctx, rng, [[petX + 4, petY], [petX + 10, petY], [petX + 8, petY - 6]], colors.ink);
+    line(ctx, rng, petX + 14, petY + 8, petX + 22, petY + 1, { w: 2, color: colors.ink });
   } else if (petType === 'dog') {
-    // 摇尾巴小柯基
-    blobFill(ctx, rng, petX, petY + 10, 16, 14, '#D7995B', 0.75);
-    strokePts(ctx, rng, ellipsePts(petX, petY + 10, 16, 14, 10), { w: 2.5, close: true, color: colors.ink });
-    blobFill(ctx, rng, petX - 8, petY + 8, 2.5, 2.5, colors.ink);
-    blobFill(ctx, rng, petX + 8, petY + 8, 2.5, 2.5, colors.ink);
-    line(ctx, rng, petX + 14, petY + 5, petX + 24, petY - 2, { w: 2.8, color: colors.ink });
+    blobFill(ctx, rng, petX, petY + 7, 13, 11, '#D7995B', 0.75);
+    strokePts(ctx, rng, ellipsePts(petX, petY + 7, 13, 11, 10), { w: 2, close: true, color: colors.ink });
+    blobFill(ctx, rng, petX - 6, petY + 5, 2, 2, colors.ink);
+    blobFill(ctx, rng, petX + 6, petY + 5, 2, 2, colors.ink);
+    line(ctx, rng, petX + 11, petY + 3, petX + 18, petY - 2, { w: 2.2, color: colors.ink });
   }
 }
 
@@ -2240,7 +2061,7 @@ function renderDoodleScene(canvas, seedStr, moodKey, animY = 0) {
 function drawCloud(ctx, rng, x, y, r, colors) {
   const pts = ellipsePts(x, y, r * 0.45, r * 0.25, 12);
   polyFill(ctx, rng, pts, colors.paper);
-  strokePts(ctx, rng, pts, { w: 2.2, close: true, color: colors.ink, alpha: 0.5 });
+  strokePts(ctx, rng, pts, { w: 1.8, close: true, color: colors.ink, alpha: 0.5 });
 }
 
 function drawSpiralEye(ctx, rng, x, y, r, color) {
@@ -2253,7 +2074,7 @@ function drawSpiralEye(ctx, rng, x, y, r, color) {
     const rr = r * t;
     pts.push([x + Math.cos(a) * rr, y + Math.sin(a) * rr]);
   }
-  strokePts(ctx, rng, pts, { w: 2.8, color: color });
+  strokePts(ctx, rng, pts, { w: 2.2, color: color });
 }
 
 function drawHeart(ctx, rng, x, y, size, color) {
@@ -2275,33 +2096,12 @@ function drawHandDrawnStar(ctx, rng, x, y, r, colors) {
     pts.push([x + Math.cos(a) * rad, y + Math.sin(a) * rad]);
   }
   polyFill(ctx, rng, pts, '#f5d061');
-  strokePts(ctx, rng, pts, { w: 2.2, close: true, color: colors.ink });
+  strokePts(ctx, rng, pts, { w: 1.8, close: true, color: colors.ink });
 }
 
 /* ─────────────────────────────────────────────────────────────
-   8. 手绘波浪分割线与二维码
+   8. 动态二维码生成
    ───────────────────────────────────────────────────────────── */
-function renderWaveDivider() {
-  const waveCanvas = document.getElementById('waveCanvas');
-  const ctx = waveCanvas.getContext('2d');
-  const W = waveCanvas.width;
-  const H = waveCanvas.height;
-  ctx.clearRect(0, 0, W, H);
-
-  const colors = getComputedThemeColors();
-  const rng = rngFrom('divider-wave');
-
-  const pts = [];
-  const waves = 14;
-  const step = W / waves;
-  for (let i = 0; i <= waves; i++) {
-    const x = i * step;
-    const y = H / 2 + (i % 2 === 0 ? -4 : 4);
-    pts.push([x, y]);
-  }
-  strokePts(ctx, rng, pts, { w: 2.4, wob: 1.4, color: colors.accent, alpha: 0.85 });
-}
-
 function updateQRCode(shareURL) {
   const qrContainer = document.getElementById('card-qrcode');
   qrContainer.innerHTML = '';
@@ -2309,14 +2109,14 @@ function updateQRCode(shareURL) {
     if (typeof QRCode !== 'undefined') {
       new QRCode(qrContainer, {
         text: shareURL,
-        width: 40,
-        height: 40,
+        width: 28,
+        height: 28,
         colorDark: '#000000',
         colorLight: '#ffffff',
         correctLevel: QRCode.CorrectLevel.L
       });
     } else {
-      qrContainer.innerHTML = `<svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/></svg>`;
+      qrContainer.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>`;
     }
   } catch (e) {}
 }
@@ -2340,16 +2140,16 @@ function renderHistoryDrawer() {
   try {
     const list = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || '[]');
     if (list.length === 0) {
-      historyList.innerHTML = '<div style="text-align:center;padding:20px;font-size:14px;color:var(--hw-ink-soft);">还没有保存过心情手账～快去生成第一张吧！</div>';
+      historyList.innerHTML = '<div style="text-align:center;padding:15px;font-size:13px;color:var(--hw-ink-soft);">还没有保存过心情手账～快去生成第一张吧！</div>';
       return;
     }
     historyList.innerHTML = list.map((item) => `
       <div class="history-item" data-seed="${item.seed}" data-mood="${item.mood}" data-name="${item.name || ''}" data-theme="${item.theme || 'pine'}">
-        <div style="display:flex;flex-direction:column;gap:2px;">
-          <div style="font-weight:bold;font-size:15px;color:var(--hw-ink);">${item.date} · ${item.tag}</div>
-          <div style="font-size:12px;color:var(--hw-ink-soft);max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.quote}</div>
+        <div style="display:flex;flex-direction:column;gap:1px;">
+          <div style="font-weight:bold;font-size:13px;color:var(--hw-ink);">${item.date} · ${item.tag}</div>
+          <div style="font-size:11px;color:var(--hw-ink-soft);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${item.quote}</div>
         </div>
-        <div style="font-size:13px;font-weight:bold;color:var(--hw-accent-ink);display:inline-flex;align-items:center;gap:3px;"><span>回看</span><svg class="svg-icon" style="width:12px;height:12px;" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+        <div style="font-size:12px;font-weight:bold;color:var(--hw-accent-ink);display:inline-flex;align-items:center;gap:2px;"><span>回看</span><svg class="svg-icon" style="width:10px;height:10px;" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
       </div>
     `).join('');
 
@@ -2371,12 +2171,12 @@ function renderHistoryDrawer() {
       });
     });
   } catch (e) {
-    historyList.innerHTML = '<div style="text-align:center;padding:20px;">读取历史记录失败</div>';
+    historyList.innerHTML = '<div style="text-align:center;padding:15px;">读取历史记录失败</div>';
   }
 }
 
 /* ─────────────────────────────────────────────────────────────
-   10. 前沿 3D 陀螺仪与鼠标指针视差感知 (Gyro & Parallax)
+   10. 前沿 3D 陀螺仪视差感知
    ───────────────────────────────────────────────────────────── */
 const card3DWrapper = document.getElementById('card-3d-wrapper');
 let isGyroEnabled = false;
@@ -2388,7 +2188,7 @@ function handlePointerMove(e) {
   const cy = rect.top + rect.height / 2;
   const dx = (e.clientX - cx) / (rect.width / 2);
   const dy = (e.clientY - cy) / (rect.height / 2);
-  card3DWrapper.style.transform = `rotateY(${dx * 9}deg) rotateX(${-dy * 9}deg)`;
+  card3DWrapper.style.transform = `rotateY(${dx * 7}deg) rotateX(${-dy * 7}deg)`;
 }
 
 function handlePointerLeave() {
@@ -2398,13 +2198,13 @@ function handlePointerLeave() {
 
 function handleDeviceOrientation(e) {
   if (!isGyroEnabled) return;
-  const gamma = Math.max(-30, Math.min(30, e.gamma || 0));
-  const beta = Math.max(-30, Math.min(30, (e.beta || 0) - 45));
-  card3DWrapper.style.transform = `rotateY(${gamma * 0.4}deg) rotateX(${-beta * 0.4}deg)`;
+  const gamma = Math.max(-25, Math.min(25, e.gamma || 0));
+  const beta = Math.max(-25, Math.min(25, (e.beta || 0) - 45));
+  card3DWrapper.style.transform = `rotateY(${gamma * 0.35}deg) rotateX(${-beta * 0.35}deg)`;
 }
 
 /* ─────────────────────────────────────────────────────────────
-   11. 界面状态机与事件响应 (Viral & Easter Egg Engine)
+   11. 界面状态机与事件响应
    ───────────────────────────────────────────────────────────── */
 const avatarCanvas = document.getElementById('avatarCanvas');
 const userInput = document.getElementById('userInput');
@@ -2426,7 +2226,6 @@ const moodCard = document.getElementById('mood-card');
 const avatarStage = document.getElementById('avatar-stage');
 const pokeTipText = document.getElementById('poke-tip-text');
 const moodTabs = document.querySelectorAll('.mood-tab');
-const optionBtns = document.querySelectorAll('.option-btn');
 const themeCircles = document.querySelectorAll('.theme-circle');
 const btnRandom = document.getElementById('btn-random');
 const btnExport = document.getElementById('btn-export');
@@ -2438,15 +2237,10 @@ const btnCloseWechatMask = document.getElementById('btn-close-wechat-mask');
 const btnCloseXhsMask = document.getElementById('btn-close-xhs-mask');
 const btnXhsDirectShare = document.getElementById('btn-xhs-direct-share');
 const xhsPreviewBox = document.getElementById('xhs-preview-box');
-const friendBanner = document.getElementById('friend-banner');
-const friendBannerText = document.getElementById('friend-banner-text');
-const btnMakeMyOwn = document.getElementById('btn-make-my-own');
 const toast = document.getElementById('toast');
 const toastText = document.getElementById('toast-text');
-const visitorCountEl = document.getElementById('random-visitor-count');
 const btnSoundToggle = document.getElementById('btn-sound-toggle');
 const soundIcon = document.getElementById('sound-icon');
-const soundLabel = document.getElementById('sound-label');
 const btnHistoryToggle = document.getElementById('btn-history-toggle');
 const historyDrawer = document.getElementById('history-drawer');
 const btnCloseHistory = document.getElementById('btn-close-history');
@@ -2457,19 +2251,14 @@ let currentMoodKey = 'happy';
 let currentSeed = 'seed-' + Date.now();
 let currentTheme = 'pine';
 
-const baseVisitor = 3120 + Math.floor(Math.random() * 400);
-visitorCountEl.textContent = baseVisitor.toLocaleString();
-
 const now = new Date();
 const formattedDate = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
 dateDisplay.textContent = formattedDate;
 
 function updateSoundButtonState() {
   if (sound.isMuted) {
-    soundLabel.textContent = '音效 关';
     soundIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>`;
   } else {
-    soundLabel.textContent = '音效 开';
     soundIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>`;
   }
 }
@@ -2483,7 +2272,6 @@ btnSoundToggle.addEventListener('click', () => {
   if (!isMuted) sound.playPop();
 });
 
-// 语音朗读
 btnSpeechRead.addEventListener('click', () => {
   triggerHaptic('light');
   sound.playPop();
@@ -2495,7 +2283,6 @@ btnSpeechRead.addEventListener('click', () => {
   }
 });
 
-// 3D 视差
 btnGyroToggle.addEventListener('click', () => {
   triggerHaptic('light');
   sound.playPop();
@@ -2503,7 +2290,7 @@ btnGyroToggle.addEventListener('click', () => {
   btnGyroToggle.classList.toggle('active', isGyroEnabled);
 
   if (isGyroEnabled) {
-    showToast('已开启 3D 视差感知！移动鼠标或倾斜手机查看');
+    showToast('已开启 3D 视差感知！移动手指或倾斜手机');
     window.addEventListener('pointermove', handlePointerMove);
     window.addEventListener('pointerleave', handlePointerLeave);
     if (window.DeviceOrientationEvent) {
@@ -2538,7 +2325,7 @@ btnCloseHistory.addEventListener('click', () => {
 function showToast(msg) {
   toastText.textContent = msg;
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2400);
+  setTimeout(() => toast.classList.remove('show'), 2200);
 }
 
 function buildShareURL() {
@@ -2564,13 +2351,12 @@ function updateAppCard(seed, moodKey = null, shouldSave = true) {
 
   const moodData = MOOD_DATABASE[currentMoodKey] || MOOD_DATABASE.happy;
   
-  // 检查特殊彩蛋关键词
   const rawInput = userInput.value.trim().toLowerCase();
   if (rawInput.includes('卡皮巴拉') || rawInput.includes('水豚') || rawInput.includes('capybara')) {
     if (eggState.specialKeyword !== 'capybara') {
       sound.playMagic();
       triggerHaptic('medium');
-      spawnSvgFx('paw', 20);
+      spawnSvgFx('paw', 18);
       triggerEggBanner('已触发隐藏彩蛋：卡皮巴拉情绪附体！');
     }
     eggState.specialKeyword = 'capybara';
@@ -2582,7 +2368,7 @@ function updateAppCard(seed, moodKey = null, shouldSave = true) {
     if (eggState.specialKeyword !== 'cat') {
       sound.playMagic();
       triggerHaptic('medium');
-      spawnSvgFx('paw', 18);
+      spawnSvgFx('paw', 16);
       triggerEggBanner('已触发隐藏彩蛋：喵星人附体！');
     }
     eggState.specialKeyword = 'cat';
@@ -2594,7 +2380,7 @@ function updateAppCard(seed, moodKey = null, shouldSave = true) {
     if (eggState.specialKeyword !== 'money') {
       sound.playCoin();
       triggerHaptic('medium');
-      spawnSvgFx('coin', 22);
+      spawnSvgFx('coin', 18);
       triggerEggBanner('已触发隐藏彩蛋：暴富吸金模式！');
     }
     eggState.specialKeyword = 'money';
@@ -2606,7 +2392,7 @@ function updateAppCard(seed, moodKey = null, shouldSave = true) {
     if (eggState.specialKeyword !== 'coffee') {
       sound.playMagic();
       triggerHaptic('medium');
-      spawnSvgFx('coffee', 16);
+      spawnSvgFx('coffee', 14);
       triggerEggBanner('已触发隐藏彩蛋：重度咖啡续命！');
     }
     eggState.specialKeyword = 'coffee';
@@ -2643,7 +2429,6 @@ function updateAppCard(seed, moodKey = null, shouldSave = true) {
   });
 
   renderDoodleScene(avatarCanvas, currentSeed, currentMoodKey);
-  renderWaveDivider();
   updateQRCode(buildShareURL());
 
   if (shouldSave) {
@@ -2687,17 +2472,17 @@ avatarStage.addEventListener('click', () => {
     quoteSource.textContent = '— 宇宙心想事成定律';
     pokeTipText.textContent = '已解锁超稀有金色锦鲤！';
 
-    spawnSvgFx('star', 24);
-    spawnSvgFx('coin', 16);
+    spawnSvgFx('star', 20);
+    spawnSvgFx('coin', 14);
     moodCard.classList.add('koi-golden-pulse');
     triggerEggBanner('终极彩蛋：恭喜解锁黄金锦鲤隐藏款！');
 
     try {
       if (typeof confetti === 'function') {
         confetti({
-          particleCount: 80,
-          spread: 90,
-          origin: { y: 0.6 },
+          particleCount: 70,
+          spread: 80,
+          origin: { y: 0.55 },
           colors: ['#FFD700', '#FFA500', '#FF6347', '#FFE4B5']
         });
       }
@@ -2717,7 +2502,7 @@ avatarStage.addEventListener('click', () => {
     moodCard.classList.remove('shake-dizzy');
     void moodCard.offsetWidth;
     moodCard.classList.add('shake-dizzy');
-    spawnSvgFx('star', 12);
+    spawnSvgFx('star', 10);
     triggerEggBanner('小人被你戳晕啦！再连戳5次试试？');
 
     renderDoodleScene(avatarCanvas, currentSeed, currentMoodKey);
@@ -2733,7 +2518,7 @@ avatarStage.addEventListener('click', () => {
     if (!startT) startT = t;
     const p = (t - startT) / dur;
     if (p < 1) {
-      const offset = -Math.sin(p * Math.PI) * 28;
+      const offset = -Math.sin(p * Math.PI) * 24;
       renderDoodleScene(avatarCanvas, currentSeed, currentMoodKey, offset);
       requestAnimationFrame(jump);
     } else {
@@ -2748,7 +2533,7 @@ function triggerHeartEgg() {
   triggerHaptic('medium');
   eggState.isHeart = true;
   pokeTipText.textContent = '摸摸头，今天被爱着呢～';
-  spawnSvgFx('heart', 18);
+  spawnSvgFx('heart', 16);
   triggerEggBanner('触发摸摸头心动彩蛋！');
   renderDoodleScene(avatarCanvas, currentSeed, currentMoodKey);
   showToast('触发摸摸头心动彩蛋！');
@@ -2808,13 +2593,13 @@ btnShareXHS.addEventListener('click', () => {
   sound.playPop();
   triggerHaptic('light');
   xhsMask.classList.add('active');
-  xhsPreviewBox.innerHTML = '<span style="font-size:12px;color:#888;">正在生成小红书专属 3:4 卡片...</span>';
+  xhsPreviewBox.innerHTML = '<span style="font-size:11px;color:#888;">正在生成 3:4 卡片...</span>';
 
   html2canvas(moodCard, { scale: 3, backgroundColor: null }).then(canvas => {
     const img = new Image();
     img.src = canvas.toDataURL('image/png');
     img.style.maxWidth = '100%';
-    img.style.maxHeight = '180px';
+    img.style.maxHeight = '140px';
     img.style.borderRadius = '6px';
     xhsPreviewBox.innerHTML = '';
     xhsPreviewBox.appendChild(img);
@@ -2876,17 +2661,6 @@ moodTabs.forEach(tab => {
   });
 });
 
-optionBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    sound.playPop();
-    triggerHaptic('light');
-    optionBtns.forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    const pattern = btn.dataset.pattern;
-    moodCard.className = `mood-card pattern-${pattern}`;
-  });
-});
-
 themeCircles.forEach(circle => {
   circle.addEventListener('click', () => {
     sound.playPop();
@@ -2903,7 +2677,6 @@ themeCircles.forEach(circle => {
 
     setTimeout(() => {
       renderDoodleScene(avatarCanvas, currentSeed, currentMoodKey);
-      renderWaveDivider();
       updateQRCode(buildShareURL());
     }, 50);
   });
@@ -2925,15 +2698,15 @@ btnRandom.addEventListener('click', () => {
     userInput.value = pick(rngFrom(String(randNum)), nicknames);
   }
 
-  moodCard.style.transform = 'scale(0.95) rotate(-1.5deg)';
-  setTimeout(() => { moodCard.style.transform = 'none'; }, 200);
+  moodCard.style.transform = 'scale(0.96) rotate(-1deg)';
+  setTimeout(() => { moodCard.style.transform = 'none'; }, 180);
 
   try {
     if (typeof confetti === 'function') {
       confetti({
-        particleCount: 50,
-        spread: 70,
-        origin: { y: 0.65 },
+        particleCount: 45,
+        spread: 65,
+        origin: { y: 0.55 },
         colors: ['#53A548', '#C4553B', '#F5D061', '#4A6FA5', '#E26D46']
       });
     }
@@ -2954,22 +2727,12 @@ btnExport.addEventListener('click', () => {
     link.href = canvasOutput.toDataURL('image/png');
     link.click();
 
-    btnExport.querySelector('span').textContent = '保存卡片图片';
+    btnExport.querySelector('span').textContent = '保存';
     showToast('拍立得手账图片已下载！');
   }).catch(() => {
-    btnExport.querySelector('span').textContent = '保存卡片图片';
+    btnExport.querySelector('span').textContent = '保存';
     showToast('保存失败，请稍后重试');
   });
-});
-
-btnMakeMyOwn.addEventListener('click', () => {
-  sound.playWoosh();
-  triggerHaptic('light');
-  friendBanner.style.display = 'none';
-  userInput.value = '';
-  window.history.replaceState({}, '', window.location.pathname);
-  updateAppCard('rand-' + Date.now());
-  showToast('已为你开启全新心情测试！');
 });
 
 function initFromURL() {
@@ -2982,17 +2745,13 @@ function initFromURL() {
   if (nameParam || moodParam || seedParam) {
     if (nameParam) {
       userInput.value = nameParam;
-      friendBannerText.textContent = `你收到了 @${nameParam} 分享的今日心情卡片`;
     }
-    friendBanner.style.display = 'flex';
-
     if (themeParam) {
       currentTheme = themeParam;
       document.documentElement.setAttribute('data-theme', themeParam);
       document.body.setAttribute('data-theme', themeParam);
       themeCircles.forEach(c => c.classList.toggle('active', c.dataset.theme === themeParam));
     }
-
     updateAppCard(seedParam || `shared-${Date.now()}`, moodParam || 'happy');
   } else {
     updateAppCard('init-' + Date.now());
