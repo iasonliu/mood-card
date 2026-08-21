@@ -251,7 +251,21 @@ function renderHistoryList() {
   });
 }
 
-// ──────────────── 陀螺仪视差 ────────────────
+// ──────────────── 陀螺仪视差平滑阻尼引擎 ────────────────
+let targetRotX = 0;
+let targetRotY = 0;
+let currentRotX = 0;
+let currentRotY = 0;
+let parallaxRaf = null;
+
+function animateParallax() {
+  if (!isGyroEnabled) return;
+  currentRotX += (targetRotX - currentRotX) * 0.14;
+  currentRotY += (targetRotY - currentRotY) * 0.14;
+  card3DWrapper.style.transform = `rotateY(${currentRotY.toFixed(2)}deg) rotateX(${currentRotX.toFixed(2)}deg)`;
+  parallaxRaf = requestAnimationFrame(animateParallax);
+}
+
 function handlePointerMove(e) {
   if (!isGyroEnabled) return;
   const rect = card3DWrapper.getBoundingClientRect();
@@ -259,19 +273,22 @@ function handlePointerMove(e) {
   const cy = rect.top + rect.height / 2;
   const dx = (e.clientX - cx) / (rect.width / 2);
   const dy = (e.clientY - cy) / (rect.height / 2);
-  card3DWrapper.style.transform = `rotateY(${dx * 7}deg) rotateX(${-dy * 7}deg)`;
+  targetRotY = Math.max(-8, Math.min(8, dx * 8));
+  targetRotX = Math.max(-8, Math.min(8, -dy * 8));
 }
 
 function handlePointerLeave() {
   if (!isGyroEnabled) return;
-  card3DWrapper.style.transform = 'rotateY(0deg) rotateX(0deg)';
+  targetRotX = 0;
+  targetRotY = 0;
 }
 
 function handleDeviceOrientation(e) {
   if (!isGyroEnabled) return;
   const gamma = Math.max(-25, Math.min(25, e.gamma || 0));
   const beta = Math.max(-25, Math.min(25, (e.beta || 0) - 45));
-  card3DWrapper.style.transform = `rotateY(${gamma * 0.35}deg) rotateX(${-beta * 0.35}deg)`;
+  targetRotY = gamma * 0.35;
+  targetRotX = -beta * 0.35;
 }
 
 // ──────────────── 彩蛋连戳与摸摸头 ────────────────
@@ -411,6 +428,7 @@ export function initApp() {
 
     if (isGyroEnabled) {
       showToast('已开启 3D 视差感知！移动手指或倾斜手机');
+      animateParallax();
       window.addEventListener('pointermove', handlePointerMove);
       window.addEventListener('pointerleave', handlePointerLeave);
       if (window.DeviceOrientationEvent) {
@@ -424,6 +442,8 @@ export function initApp() {
       }
     } else {
       showToast('已关闭 3D 视差');
+      if (parallaxRaf) cancelAnimationFrame(parallaxRaf);
+      targetRotX = targetRotY = currentRotX = currentRotY = 0;
       card3DWrapper.style.transform = 'none';
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerleave', handlePointerLeave);

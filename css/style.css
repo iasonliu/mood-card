@@ -1,22 +1,23 @@
 /* ─────────────────────────────────────────────────────────────
-   MoodHand Design System & Token Themes
+   MoodHand Design System & Token Themes (UI/UX Pro Max Standard)
    ───────────────────────────────────────────────────────────── */
 :root, html[data-theme="pine"], body[data-theme="pine"] {
   --hw-paper: #FFFFFC;
   --hw-paper-tint: #F6F4EB;
   --hw-card-bg: #FCFAF2;
   --hw-ink: #003E1F;
-  --hw-ink-soft: rgba(0, 62, 31, 0.70);
+  --hw-ink-soft: #235A38;
   --hw-ink-subtle: rgba(0, 62, 31, 0.12);
   --hw-accent: #53A548;
-  --hw-accent-ink: #326E2A;
+  --hw-accent-ink: #27621F;
   --hw-accent-bg: rgba(83, 165, 72, 0.14);
   --hw-stamp: #C4553B;
   --hw-card-border: #003E1F;
   --hw-tape: rgba(220, 205, 155, 0.72);
-  --hw-do: #2E7D32;
-  --hw-dont: #C62828;
+  --hw-do: #1E6B23;
+  --hw-dont: #B71C1C;
   --card-shadow: 4px 5px 0px var(--hw-ink);
+  --focus-ring: 2px solid #53A548;
 }
 
 html[data-theme="terracotta"], body[data-theme="terracotta"] {
@@ -24,7 +25,7 @@ html[data-theme="terracotta"], body[data-theme="terracotta"] {
   --hw-paper-tint: #F8F1E7;
   --hw-card-bg: #FCF7F0;
   --hw-ink: #2C2420;
-  --hw-ink-soft: rgba(44, 36, 32, 0.70);
+  --hw-ink-soft: #5C4A42;
   --hw-ink-subtle: rgba(44, 36, 32, 0.12);
   --hw-accent: #C4553B;
   --hw-accent-ink: #9E3A23;
@@ -32,9 +33,10 @@ html[data-theme="terracotta"], body[data-theme="terracotta"] {
   --hw-stamp: #C4553B;
   --hw-card-border: #2C2420;
   --hw-tape: rgba(230, 195, 175, 0.72);
-  --hw-do: #2E7D32;
-  --hw-dont: #C62828;
+  --hw-do: #1E6B23;
+  --hw-dont: #B71C1C;
   --card-shadow: 4px 5px 0px var(--hw-ink);
+  --focus-ring: 2px solid #C4553B;
 }
 
 html[data-theme="indigo"], body[data-theme="indigo"] {
@@ -42,17 +44,18 @@ html[data-theme="indigo"], body[data-theme="indigo"] {
   --hw-paper-tint: #EDF1F7;
   --hw-card-bg: #F7FAFC;
   --hw-ink: #1B2845;
-  --hw-ink-soft: rgba(27, 40, 69, 0.70);
+  --hw-ink-soft: #384C73;
   --hw-ink-subtle: rgba(27, 40, 69, 0.12);
   --hw-accent: #4A6FA5;
-  --hw-accent-ink: #2B4C7E;
+  --hw-accent-ink: #204173;
   --hw-accent-bg: rgba(74, 111, 165, 0.14);
   --hw-stamp: #D14949;
   --hw-card-border: #1B2845;
   --hw-tape: rgba(190, 205, 230, 0.72);
-  --hw-do: #1E6B7B;
-  --hw-dont: #D14949;
+  --hw-do: #155E6D;
+  --hw-dont: #C22D2D;
   --card-shadow: 4px 5px 0px var(--hw-ink);
+  --focus-ring: 2px solid #4A6FA5;
 }
 
 html[data-theme="sunset"], body[data-theme="sunset"] {
@@ -60,17 +63,18 @@ html[data-theme="sunset"], body[data-theme="sunset"] {
   --hw-paper-tint: #FCF0E8;
   --hw-card-bg: #FDF6F0;
   --hw-ink: #3D261C;
-  --hw-ink-soft: rgba(61, 38, 28, 0.70);
+  --hw-ink-soft: #6E4939;
   --hw-ink-subtle: rgba(61, 38, 28, 0.12);
   --hw-accent: #E26D46;
-  --hw-accent-ink: #B34824;
+  --hw-accent-ink: #A33A17;
   --hw-accent-bg: rgba(226, 109, 70, 0.14);
   --hw-stamp: #C93B3B;
   --hw-card-border: #3D261C;
   --hw-tape: rgba(240, 200, 175, 0.72);
-  --hw-do: #2E7D32;
-  --hw-dont: #C93B3B;
+  --hw-do: #1E6B23;
+  --hw-dont: #B71C1C;
   --card-shadow: 4px 5px 0px var(--hw-ink);
+  --focus-ring: 2px solid #E26D46;
 }
 
 html[data-theme="lavender"], body[data-theme="lavender"] {
@@ -78,19 +82,21 @@ html[data-theme="lavender"], body[data-theme="lavender"] {
   --hw-paper-tint: #F3EEF8;
   --hw-card-bg: #FAF6FD;
   --hw-ink: #2E223D;
-  --hw-ink-soft: rgba(46, 34, 61, 0.70);
+  --hw-ink-soft: #5C4778;
   --hw-ink-subtle: rgba(46, 34, 61, 0.12);
   --hw-accent: #8762A6;
-  --hw-accent-ink: #653E87;
+  --hw-accent-ink: #552F75;
   --hw-accent-bg: rgba(135, 98, 166, 0.14);
   --hw-stamp: #BF4372;
   --hw-card-border: #2E223D;
   --hw-tape: rgba(215, 195, 230, 0.72);
-  --hw-do: #2E7D32;
+  --hw-do: #1E6B23;
   --hw-dont: #BF4372;
   --card-shadow: 4px 5px 0px var(--hw-ink);
+  --focus-ring: 2px solid #8762A6;
 }
 
+/* 隐藏款锦鲤金色主题 */
 html[data-egg="koi"] {
   --hw-card-bg: #FFFDF0 !important;
   --hw-accent: #E5A93B !important;
@@ -109,7 +115,7 @@ html[data-egg="koi"] {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   单屏流响应式布局 (100dvh Zero-Scroll Architecture)
+   单屏流响应式布局 (100dvh Zero-Scroll)
    ───────────────────────────────────────────────────────────── */
 body {
   height: 100vh;
@@ -125,10 +131,15 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 8px 10px 10px;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
   perspective: 1200px;
+}
+
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .svg-icon {
@@ -147,41 +158,47 @@ body {
 /* 顶部栏 */
 .top-compact-bar {
   width: 100%;
-  max-width: 400px;
+  max-width: 390px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   height: 32px;
   flex-shrink: 0;
-  padding: 0 4px;
+  padding: 0 2px;
+  gap: 4px;
 }
 
 .brand-title-wrap {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  flex-shrink: 1;
+  min-width: 0;
 }
 
 .brand-title {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: bold;
   color: var(--hw-ink);
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
+  letter-spacing: 0.1px;
+  white-space: nowrap;
 }
 
 .tool-actions-row {
   display: flex;
-  gap: 5px;
+  gap: 4px;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .mini-tool-btn {
   background: var(--hw-paper);
   border: 1.5px solid var(--hw-ink);
-  border-radius: 14px;
-  padding: 2px 7px;
+  border-radius: 12px;
+  padding: 0 6px;
   font-size: 11px;
   font-family: inherit;
   font-weight: bold;
@@ -189,10 +206,15 @@ body {
   cursor: pointer;
   box-shadow: 1.5px 1.5px 0 var(--hw-ink);
   display: inline-flex;
+  flex-direction: row;
   align-items: center;
-  gap: 3px;
-  transition: all 0.1s;
+  justify-content: center;
+  gap: 2px;
+  transition: transform 0.15s ease, background 0.15s ease;
   height: 24px;
+  line-height: 24px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .mini-tool-btn.active {
@@ -202,7 +224,7 @@ body {
 }
 
 .mini-tool-btn:active {
-  transform: translate(1px, 1px);
+  transform: translate(1.5px, 1.5px);
   box-shadow: 0 0 0;
 }
 
@@ -218,7 +240,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: 4px 0;
+  margin: 2px 0;
 }
 
 .mood-card {
@@ -340,7 +362,7 @@ body {
   border-radius: 10px;
   opacity: 0;
   transform: translateY(3px);
-  transition: all 0.2s;
+  transition: opacity 0.2s ease, transform 0.2s ease;
   pointer-events: none;
   display: flex;
   align-items: center;
@@ -387,6 +409,7 @@ canvas.doodle-canvas {
   line-height: 1.35;
   color: var(--hw-ink);
   font-weight: 600;
+  text-wrap: balance;
 }
 
 .quote-author-source {
@@ -601,6 +624,12 @@ canvas.doodle-canvas {
   border-radius: 8px;
   outline: none;
   color: var(--hw-ink);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.sketch-input:focus {
+  border-color: var(--hw-accent);
+  background: #fff;
 }
 
 .theme-mini-row {
@@ -617,6 +646,11 @@ canvas.doodle-canvas {
   cursor: pointer;
   box-shadow: 1px 1px 0 var(--hw-ink);
   position: relative;
+  transition: transform 0.15s ease;
+}
+
+.theme-circle:hover {
+  transform: scale(1.1);
 }
 
 .theme-circle.active::after {
@@ -649,8 +683,9 @@ canvas.doodle-canvas {
   align-items: center;
   justify-content: center;
   gap: 2px;
-  transition: all 0.1s ease;
-  height: 36px;
+  transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  height: 38px;
+  min-height: 38px;
 }
 
 .mood-tab .svg-icon {
@@ -659,7 +694,7 @@ canvas.doodle-canvas {
 }
 
 .mood-tab.active {
-  transform: translate(1px, 1px);
+  transform: translate(1px, 1.5px);
   box-shadow: 0 0 0;
   background: var(--hw-accent-bg);
   border-color: var(--hw-accent-ink);
@@ -675,7 +710,8 @@ canvas.doodle-canvas {
 }
 
 .action-btn {
-  height: 35px;
+  height: 38px;
+  min-height: 38px;
   font-family: inherit;
   font-size: 12px;
   font-weight: bold;
@@ -687,7 +723,7 @@ canvas.doodle-canvas {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  transition: all 0.1s;
+  transition: all 0.12s ease;
   color: #fff;
   white-space: nowrap;
   padding: 0 4px;
@@ -934,4 +970,29 @@ canvas.doodle-canvas {
   align-items: center;
   cursor: pointer;
   box-shadow: 1.5px 1.5px 0 var(--hw-ink);
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.history-item:hover {
+  background: var(--hw-accent-bg);
+}
+
+.history-item:active {
+  transform: translate(1px, 1px);
+  box-shadow: 0 0 0;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Reduced Motion Accessibility (WCAG standard)
+   ───────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .card-container {
+    transform: none !important;
+  }
 }
