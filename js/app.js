@@ -6,6 +6,7 @@ import { rngFrom, pick, jit } from './draw-engine.js';
 import { renderDoodleScene, eggState, triggerEggBanner, spawnSvgFx } from './avatar-scene.js';
 import { SoundEngine, SpeechEngine, triggerHaptic } from './audio.js';
 import { saveCardToHistory, getHistoryRecords } from './storage.js';
+import { Avatar3DRig } from './avatar-3d.js';
 
 // 初始化核心服务
 export const sound = new SoundEngine();
@@ -53,13 +54,16 @@ const btnCloseHistory = document.getElementById('btn-close-history');
 const historyList = document.getElementById('history-list');
 const btnSpeechRead = document.getElementById('btn-speech-read');
 const speechText = document.getElementById('speech-text');
+const btnDimensionToggle = document.getElementById('btn-dimension-toggle');
+const dimText = document.getElementById('dim-text');
 const btnGyroToggle = document.getElementById('btn-gyro-toggle');
 const card3DWrapper = document.getElementById('card-3d-wrapper');
 
 let currentMoodKey = 'happy';
 let currentSeed = 'seed-' + Date.now();
 let currentTheme = 'pine';
-let isGyroEnabled = false;
+let is3DMode = false;
+let avatar3D = null;
 
 // 初始化日期
 const now = new Date();
@@ -201,6 +205,9 @@ export function updateAppCard(seed, moodKey = null, shouldSave = true) {
   });
 
   renderDoodleScene(avatarCanvas, currentSeed, currentMoodKey);
+  if (is3DMode && avatar3D) {
+    avatar3D.build(currentSeed, currentMoodKey);
+  }
   updateQRCode(buildShareURL());
 
   if (shouldSave) {
@@ -357,6 +364,9 @@ function handlePoke() {
 
   sound.playPop();
   triggerHaptic('light');
+  if (is3DMode && avatar3D) {
+    avatar3D.jump();
+  }
   let startT = null;
   const dur = 340;
   function jump(t) {
@@ -420,36 +430,62 @@ export function initApp() {
   });
 
   // 陀螺仪视差
-  btnGyroToggle.addEventListener('click', () => {
-    triggerHaptic('light');
-    sound.playPop();
-    isGyroEnabled = !isGyroEnabled;
-    btnGyroToggle.classList.toggle('active', isGyroEnabled);
+  if (btnGyroToggle) {
+    btnGyroToggle.addEventListener('click', () => {
+      triggerHaptic('light');
+      sound.playPop();
+      isGyroEnabled = !isGyroEnabled;
+      btnGyroToggle.classList.toggle('active', isGyroEnabled);
 
-    if (isGyroEnabled) {
-      showToast('已开启 3D 视差感知！移动手指或倾斜手机');
-      animateParallax();
-      window.addEventListener('pointermove', handlePointerMove);
-      window.addEventListener('pointerleave', handlePointerLeave);
-      if (window.DeviceOrientationEvent) {
-        if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-          DeviceOrientationEvent.requestPermission().then(state => {
-            if (state === 'granted') window.addEventListener('deviceorientation', handleDeviceOrientation);
-          }).catch(() => {});
-        } else {
-          window.addEventListener('deviceorientation', handleDeviceOrientation);
+      if (isGyroEnabled) {
+        showToast('已开启 3D 视差感知！移动手指或倾斜手机');
+        animateParallax();
+        window.addEventListener('pointermove', handlePointerMove);
+        window.addEventListener('pointerleave', handlePointerLeave);
+        if (window.DeviceOrientationEvent) {
+          if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+            DeviceOrientationEvent.requestPermission().then(state => {
+              if (state === 'granted') window.addEventListener('deviceorientation', handleDeviceOrientation);
+            }).catch(() => {});
+          } else {
+            window.addEventListener('deviceorientation', handleDeviceOrientation);
+          }
         }
+      } else {
+        showToast('已关闭 3D 视差');
+        if (parallaxRaf) cancelAnimationFrame(parallaxRaf);
+        targetRotX = targetRotY = currentRotX = currentRotY = 0;
+        card3DWrapper.style.transform = 'none';
+        window.removeEventListener('pointermove', handlePointerMove);
+        window.removeEventListener('pointerleave', handlePointerLeave);
+        window.removeEventListener('deviceorientation', handleDeviceOrientation);
       }
-    } else {
-      showToast('已关闭 3D 视差');
-      if (parallaxRaf) cancelAnimationFrame(parallaxRaf);
-      targetRotX = targetRotY = currentRotX = currentRotY = 0;
-      card3DWrapper.style.transform = 'none';
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerleave', handlePointerLeave);
-      window.removeEventListener('deviceorientation', handleDeviceOrientation);
-    }
-  });
+    });
+  }
+
+  // 2D手绘 / 3D盲盒手办 模式切换
+  if (btnDimensionToggle) {
+    btnDimensionToggle.addEventListener('click', () => {
+      sound.playPop();
+      triggerHaptic('light');
+      is3DMode = !is3DMode;
+      btnDimensionToggle.classList.toggle('active', is3DMode);
+      if (dimText) dimText.textContent = is3DMode ? '2D' : '3D';
+
+      if (!avatar3D) {
+        avatar3D = new Avatar3DRig(avatarStage);
+      }
+      avatar3D.setVisible(is3DMode);
+      avatarCanvas.style.display = is3DMode ? 'none' : 'block';
+
+      if (is3DMode) {
+        avatar3D.build(currentSeed, currentMoodKey);
+        showToast('已进入 3D 盲盒手办模式！支持 360° 旋转');
+      } else {
+        showToast('已返回 2D 手绘模式');
+      }
+    });
+  }
 
   // 历史抽屉
   btnHistoryToggle.addEventListener('click', () => {
